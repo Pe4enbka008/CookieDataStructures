@@ -1091,12 +1091,5 @@ namespace smth
     } // class CookieNodeList
 
 
-    /// <summary>
-    /// NodeList but always made of objects  -- not bagrut supported!
-    /// </summary>
-    public class CookieList : CookieNodeList<object>
-    { }
-
-
 } // namespace smth
 
