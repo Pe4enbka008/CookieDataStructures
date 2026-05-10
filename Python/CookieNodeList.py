@@ -34,16 +34,16 @@ class CookieNode:
         return self.value
 
     # getters-setters
-    def GetValue(self):
+    def get_value(self):
         return self.value
 
-    def GetNext(self):
+    def get_next(self):
         return self.next_node
 
-    def SetValue(self, value):
+    def set_value(self, value):
         self.value = value
 
-    def SetNext(self, next_node):
+    def set_next(self, next_node):
         self.next_node = next_node
 
     # end
