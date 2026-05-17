@@ -509,10 +509,6 @@ namespace smth
     public class CookieNodeList<ListType> : IEnumerable<ListType>, ICollection<ListType>
     {
         /// <summary>
-        /// Number of slots busy at the moment
-        /// </summary>
-        private int count;
-        /// <summary>
         /// The list itself
         /// </summary>
         private CookieNode<ListType>? head_node;
@@ -526,14 +522,13 @@ namespace smth
         /// <summary>
         /// Class setter
         /// </summary>
-        public CookieNodeList() { this.head_node = null; this.count = 0; }
+        public CookieNodeList() { this.head_node = null; }
         /// <summary>
         /// Class setter with valuables
         /// </summary>
         public CookieNodeList(ListType[] arr)
         {
             CookieNode<ListType> prev_node = null;
-            this.count = 0;
 
             foreach (ListType value in arr)
             {
@@ -554,7 +549,6 @@ namespace smth
         private CookieNodeList(CookieNodeList<ListType> nodes)
         {
             CookieNode<ListType> prev_node = null;
-            this.count = 0;
 
             for (int i = 0; i < nodes.Length; i++)
             {
@@ -577,19 +571,13 @@ namespace smth
         /// Return current length of the list
         /// </summary>
         /// <returns>Int represented length</returns>
-        public int Length { get { this.CheckCount(); return this.count; } }
+        public int Length { get { this.CheckCount(); return this.RecursionCount(this.head_node); } }
         /// <summary>
         /// Return current length of the list
         /// </summary>
         /// <returns>Int represented length</returns>
-        public int Count { get { this.CheckCount(); return this.count; } }
+        public int Count { get { this.CheckCount(); return this.RecursionCount(this.head_node); } }
 
-
-        /// <summary>
-        /// Recounts number of nodes in the node list!
-        /// </summary>
-        private void CheckCount()
-        { this.count = RecursionCount(this.head_node); }
 
         /// <summary>
         /// Counts number of nodes in the node list! Recursively
@@ -611,11 +599,8 @@ namespace smth
         /// <returns>Number of items found</returns>
         public int CountElementDuplicates(ListType item)
         {
-            if (this.head_node == null || !this.Contains(item))
-                return 0;
-
-            CookieNode<ListType> node = this.head_node;
-            return CountElementDuplicatesLoop(item, node);
+            if (this.head_node == null || !this.Contains(item)) return 0;
+            return CountElementDuplicatesLoop(item, this.head_node);
         } // CountElementDuplicates
 
         /// <summary>
@@ -626,11 +611,8 @@ namespace smth
         private int CountElementDuplicatesLoop(ListType item, CookieNode<ListType> node)
         {
             int dupe = 0;
-            if (node == null)
-                return dupe;
-
-            if (item.Equals(node.Value))
-                dupe++;
+            if (node == null) return dupe;
+            if (item.Equals(node.Value)) dupe++;
             return dupe + CountElementDuplicatesLoop(item, node.GetNext());
         } // CountElementDuplicatesLoop
 
@@ -644,7 +626,7 @@ namespace smth
         /// <returns>Element at specified index</returns>
         public ListType this[int index] // INDEXES!
         {
-            get => Get(index);
+            get => this.Get(index);
             set => this.AddAt(value, index);
         } // ListType
 
@@ -686,9 +668,7 @@ namespace smth
         /// <exception cref="ArgumentOutOfRangeException">If the index is out-of-range</exception>
         public ListType Get(int index)
         {
-            this.CheckCount();
-            if (index < 0 || index >= this.count)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new ArgumentOutOfRangeException(nameof(index));
 
             CookieNode<ListType>? some_node = this.head_node;
             for (; 0 < index; index--)
@@ -702,7 +682,7 @@ namespace smth
         /// <returns>Found element, null if no elements are in the list</returns>
         public ListType GetFirst()
         {
-            if (this.head_node == null || this.count == 0)
+            if (this.head_node == null)
                 return (ListType)(object)null;
             return this.Get(0);
         } // GetFirst
@@ -731,10 +711,10 @@ namespace smth
         /// Changes the type of the list to the requested - be sure it's convertable!
         /// </summary>
         /// <typeparam name="RequestedType">Type to change to</typeparam>
-        /// <returns>If possible, the list, if not null</returns>
+        /// <returns>If possible, the list, if not null list</returns>
         public CookieNodeList<RequestedType>? ChangeType<RequestedType>()
         {
-            if (this.count == 0) return null;
+            if (this.head_node == null) return null;
             CookieNodeList<RequestedType> new_list = new CookieNodeList<RequestedType>();
 
             CookieNode<ListType>? nodes = this.head_node;
@@ -758,10 +738,10 @@ namespace smth
         /// Changes the type of the list to the requested
         /// </summary>
         /// <typeparam name="RequestedType">Type to change to</typeparam>
-        /// <returns>If possible, the list, if not null</returns>
+        /// <returns>A list of possible values</returns>
         public CookieNodeList<RequestedType>? PartlyChangeType<RequestedType>()
         {
-            if (this.count == 0) return null;
+            if (this.head_node == null) return null;
             CookieNodeList<RequestedType> new_list = new CookieNodeList<RequestedType>();
 
             CookieNode<ListType>? nodes = this.head_node;
@@ -791,30 +771,26 @@ namespace smth
         /// <param name="item">Item to add</param>
         public void Append(ListType item)
         {
-            this.CheckCount();
             if (this.head_node == null)
             {
                 this.head_node = new(item);
-                this.count = 1;
                 return;
             } // if
 
             CookieNode<ListType> some_node = this.head_node;
             while (some_node.GetNext() != null)
                 some_node = some_node.GetNext();
-
             some_node.SetNext(new CookieNode<ListType>(item));
-            this.count++;
         } // Append
+
         /// <summary>
         /// Adds another CookieNodeList to the end of this list
         /// </summary>
         /// <param name="nodes">List to add</param>
         public void Append(CookieNodeList<ListType> nodes)
         {
-            if (nodes == null || nodes.Length == 0)
-                return;
-
+            if (nodes == null || nodes.head_node == null) return;
+            
             CookieNode<ListType> tail = this.head_node;
             CookieNode<ListType> other_nodes = nodes.head_node;
             if (tail == null)
@@ -824,10 +800,8 @@ namespace smth
                 other_nodes = other_nodes.GetNext();
             } // if 
             else
-            {
                 while (tail.GetNext() != null)
                     tail = tail.GetNext();
-            } // else
 
             // add the nodes
             other_nodes = nodes.head_node;
@@ -837,8 +811,8 @@ namespace smth
                 tail = tail.GetNext();
                 other_nodes = other_nodes.GetNext();
             } // while
-            this.CheckCount();
         } // Append
+
 
         /// <summary>
         /// Adds an item to the beginning of the list
@@ -846,27 +820,24 @@ namespace smth
         /// <param name="item">Item to add</param>
         public void Add(ListType item)
         {
-            this.CheckCount();
             if (this.head_node == null)
             {
                 this.head_node = new(item);
-                this.count = 1;
                 return;
             } // if
 
             CookieNode<ListType> some_node = new(item);
             some_node.SetNext(this.head_node);
             this.head_node = some_node;
-            this.count++;
         } // Add
+
         /// <summary>
         /// Adds another CookieNodeList to the beginning of this list
         /// </summary>
         /// <param name="nodes">List to add</param>
         public void Add(CookieNodeList<ListType> nodes)
         {
-            if (nodes == null || nodes.head_node == null)
-                return;
+            if (nodes.head_node == null) return;
 
             CookieNode<ListType> last = nodes.head_node;
             while (last.GetNext() != null)
@@ -874,28 +845,38 @@ namespace smth
 
             last.SetNext(this.head_node);
             this.head_node = nodes.head_node;
-            this.CheckCount();
         } // Add
 
         /// <summary>
-        /// Adds an item to the beginning of the list
+        /// Adds an item to index give in the list
         /// </summary>
         /// <param name="item">Item to add</param>
         public void AddAt(ListType item, int index)
         {
-            this.CheckCount();
-            if (this.head_node == null)
+            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new ArgumentOutOfRangeException(nameof(index));
+
+            CookieNode<ListType> newNode = new(item);
+            if (this.head_node == null || index == 0)
             {
-                this.head_node = new(item);
-                this.count = 1;
+                newNode.SetNext(this.head_node);
+                this.head_node = newNode;
                 return;
             } // if
 
-            CookieNode<ListType> some_node = new(item);
-            some_node.SetNext(this.head_node);
-            this.head_node = some_node;
-            this.count++;
-        } // Add
+            CookieNode<ListType> current = this.head_node;
+            int currentIndex = 0;
+
+            while (current != null && currentIndex < index - 1)
+            {
+                current = current.GetNext();
+                currentIndex++;
+            } // while
+
+            if (current == null)  throw new IndexOutOfRangeException(nameof(index));
+
+            newNode.SetNext(current.GetNext());
+            current.SetNext(newNode);
+        } // AddAt
 
 
 
@@ -907,7 +888,6 @@ namespace smth
         /// <returns>True if the remove was successful; otherwise false</returns>
         public bool Remove(ListType item)
         {
-            this.CheckCount();
             if (this.head_node == null)
                 return false;
 
@@ -915,7 +895,6 @@ namespace smth
             if (this.head_node.Value.Equals(item))
             {
                 this.head_node = this.head_node.GetNext();
-                this.count--;
                 return false;
             } // if
 
@@ -925,7 +904,6 @@ namespace smth
                 if (some_node.GetNext().Value.Equals(item))
                 {
                     some_node.SetNext(some_node.GetNext().GetNext());
-                    this.count--;
                     return true;
                 } // if
                 some_node = some_node.GetNext();
@@ -940,38 +918,32 @@ namespace smth
         /// <exception cref="ArgumentOutOfRangeException">If the index is out-of-range</exception>
         public void RemoveAt(int index)
         {
-            this.CheckCount();
-            if (this.head_node == null)
-                return;
-
-            if (index < 0 || index >= this.count)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if (this.head_node == null) return;
+            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new ArgumentOutOfRangeException(nameof(index));
 
             // item is head
             if (index == 0)
             {
                 this.head_node = this.head_node.GetNext();
-                this.count--;
                 return;
-            }
+            } // if
 
             CookieNode<ListType> some_node = this.head_node;
             for (; index > 1; index--)
                 some_node = some_node.GetNext();
             some_node.SetNext(some_node.GetNext().GetNext());
-            this.count--;
         } // RemoveAt
 
         /// <summary>
         /// Removes the last element in the list
         /// </summary>
         public void RemoveLast()
-        { if (this.count > 0) this.RemoveAt(this.count - 1); }
+        { if (this.head_node != null) this.RemoveAt(RecursionCount(this.head_node) - 1); }
         /// <summary>
         /// Removes the first element in the list
         /// </summary>
         public void RemoveFirst()
-        { if (this.count > 0) this.RemoveAt(0); }
+        { if (this.head_node != null) this.RemoveAt(0); }
 
         /// <summary>
         /// Removes all instance of element given, leaving one the first one
@@ -1011,49 +983,48 @@ namespace smth
         public void Clear()
         {
             this.head_node = null;
-            this.count = 0;
         } // Clear
 
 
 
-        // overrride
+        // override
 
         // Object
-        public override string ToString()
-        {
-            string[] str = new string[this.count];
-            CookieNode<ListType> some_node = this.head_node;
-            for (int i = 0; i < this.count && some_node != null; i++)
-            {
-                str[i] = some_node.ToString();
-                some_node = some_node.GetNext();
-            } // for
-            return String.Join(", ", str);
-        } // override ToString
 
+        /// <summary>
+        /// override for ToString to - ['value', 'value', 'value', ...]
+        /// </summary>
+        /// <returns>string of the class</returns>
+        public override string ToString()
+        { return ToString(", "); }
+
+        /// <summary>
+        /// override for ToString to - ['value'{split} 'value'{split} 'value'{split} ...]
+        /// </summary>
+        /// <returns>string of the class</returns>
         public string ToString(string split)
         {
-            string[] str = new string[this.count];
-            CookieNode<ListType> some_node = this.head_node;
-            for (int i = 0; i < this.count && some_node != null; i++)
+            if (this.nodes == null)
+                return "[]";
+
+            string str = "[";
+            CookieNode<T>? node = this.nodes;
+
+            while (node != null)
             {
-                str[i] = some_node.ToString();
-                some_node = some_node.GetNext();
-            } // for
-            return String.Join(split, str);
+                str += node.ToString();
+                if (node.GetNext() != null)
+                    str += split;
+                node = node.GetNext();
+            } // while
+
+            return str + "]";
         } // override ToString
 
 
         // IEnumerable
         public IEnumerator<ListType> GetEnumerator() // foreach!
-        {
-            CookieNode<ListType>? current = head_node;
-            while (current != null)
-            {
-                yield return current.Value; // returns one value at a time
-                current = current.Next;
-            } // while
-        } // GetEnumerator
+        { return head_node.GetEnumerator(); } 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 

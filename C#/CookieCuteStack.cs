@@ -144,21 +144,7 @@ namespace smth
         /// <returns>string of the class</returns>
         public override string ToString()
         {
-            if (this.nodes == null)
-                return "[]";
-
-            string str = "[";
-            CookieNode<T>? node = this.nodes;
-
-            while (node != null)
-            {
-                str += node.ToString();
-                if (node.GetNext() != null)
-                    str += ", ";
-                node = node.GetNext();
-            } // while
-
-            return str + "]";
+            return ToString(", ");
         } // override ToString
 
         /// <summary>
@@ -344,23 +330,7 @@ namespace smth
         /// </summary>
         /// <returns>string of the class</returns>
         public override string ToString()
-        {
-            if (this.nodes == null)
-                return "[]";
-
-            string str = "[";
-            CookieNode<T>? node = this.nodes;
-
-            while (node != null)
-            {
-                str += node.ToString();
-                if (node.GetNext() != null)
-                    str += ", ";
-                node = node.GetNext();
-            } // while
-
-            return str + "]";
-        } // override ToString
+        { return ToString(", "); } 
 
         /// <summary>
         /// override for ToString to - ['value'{split} 'value'{split} 'value'{split} ...]

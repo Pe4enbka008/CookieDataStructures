@@ -217,17 +217,7 @@ namespace smth
         /// </summary>
         /// <returns>The dist as { key: [], ... }</returns>
         public override string ToString()
-        {
-            string str = "{ ";
-            for (int key = 0; key < keys.Length; key++)
-            {
-                str += $"{keys.Get(key)}: [";
-                CookieNodeList<TypeValue> values = list_of_list_of_values.Get(key);
-                str += values.ToString() + "]";
-                if (key < keys.Length - 1) str += ", ";  // no comma in the end!
-            } // for
-            return str + " }";
-        } // override ToString
+        { return ToString(", "); } 
 
         /// <summary>
         /// override for ToString to - ['value'{split} 'value'{split} 'value'{split} ...]
