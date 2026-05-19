@@ -69,7 +69,7 @@ namespace smth
 
         // Getters-Setters
         /// <summary>
-        /// LIFO (LAST IN ; FIRST OUT) - puts the value in front
+        /// FILO (FIRST IN ; LAST OUT) - puts the value in front
         /// </summary>
         /// <param name="value">Value to save</param>
         public void Push(T value) 
@@ -77,7 +77,7 @@ namespace smth
 
 
         /// <summary>
-        /// FILO (FIRST IN ; LAST OUT) - gets the front value ; could be null
+        /// LIFO (LAST IN ; FIRST OUT) - gets the front value ; could be null
         /// </summary>
         /// <returns>The top (last added) value</returns>
         public T? PopValue()

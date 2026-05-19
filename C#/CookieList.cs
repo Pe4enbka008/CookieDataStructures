@@ -571,12 +571,12 @@ namespace smth
         /// Return current length of the list
         /// </summary>
         /// <returns>Int represented length</returns>
-        public int Length { get { this.CheckCount(); return this.RecursionCount(this.head_node); } }
+        public int Length { get { return this.RecursionCount(this.head_node); } }
         /// <summary>
         /// Return current length of the list
         /// </summary>
         /// <returns>Int represented length</returns>
-        public int Count { get { this.CheckCount(); return this.RecursionCount(this.head_node); } }
+        public int Count { get { return this.RecursionCount(this.head_node); } }
 
 
         /// <summary>
@@ -665,10 +665,10 @@ namespace smth
         /// </summary>
         /// <param name="index">An index type Int</param>
         /// <returns>Found element</returns>
-        /// <exception cref="ArgumentOutOfRangeException">If the index is out-of-range</exception>
+        /// <exception cref="IndexOutOfRangeException">If the index is out-of-range</exception>
         public ListType Get(int index)
         {
-            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new ArgumentOutOfRangeException(nameof(index));
+            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
 
             CookieNode<ListType>? some_node = this.head_node;
             for (; 0 < index; index--)
@@ -853,7 +853,7 @@ namespace smth
         /// <param name="item">Item to add</param>
         public void AddAt(ListType item, int index)
         {
-            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new ArgumentOutOfRangeException(nameof(index));
+            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
 
             CookieNode<ListType> newNode = new(item);
             if (this.head_node == null || index == 0)
@@ -915,11 +915,11 @@ namespace smth
         /// Removes an item at the index specified
         /// </summary>
         /// <param name="index">An index</param>
-        /// <exception cref="ArgumentOutOfRangeException">If the index is out-of-range</exception>
+        /// <exception cref="IndexOutOfRangeException">If the index is out-of-range</exception>
         public void RemoveAt(int index)
         {
             if (this.head_node == null) return;
-            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new ArgumentOutOfRangeException(nameof(index));
+            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
 
             // item is head
             if (index == 0)
@@ -981,9 +981,7 @@ namespace smth
         /// Wipes the list clean
         /// </summary>
         public void Clear()
-        {
-            this.head_node = null;
-        } // Clear
+        { this.head_node = null; } 
 
 
 
