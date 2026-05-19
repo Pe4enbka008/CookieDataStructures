@@ -22,31 +22,12 @@
 namespace smth
 {
     /// <summary>
-    /// Tuple :]
+    /// This CookieDataStructure requires CookieNode.cs file!
+    /// Tuple created and better-ed by Cookie :]
     /// </summary>
-    public class CookieTurtle<T> : CookieNodeList<T>
+    public class CookieTuple<T> 
     {
-        private int length;
-
-        ///// <summary>
-        ///// Class constructor
-        ///// </summary>
-        //public CookieTurtle(CookieNodeList<T> list)
-        //{ 
-        //    this.length = list.Length;
-
-        //} // __init__
-
-
-        /// <summary>
-        /// Class constructor
-        /// </summary>
-        public CookieTurtle(T[] list) : base(list)
-        { this.length = list.Length; }
-
-
-
-
+        private CookieNode<T> nodes;
 
 
 

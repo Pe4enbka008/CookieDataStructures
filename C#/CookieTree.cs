@@ -22,18 +22,29 @@ using System;
 
 namespace smth
 {
+    /// <summary>
+    /// Node for Tree or double-linked list
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class CookieBinNode<T>
     {
         private T value;
         private CookieBinNode<T>? left;
         private CookieBinNode<T>? right;
 
+        /// <summary>
+        /// CookieBinNode constructor
+        /// </summary>
+        /// <param name="value">value to save in the node</param>
         public CookieBinNode(T value)
         {
             this.value = value;
             this.left = null;
             this.right = null;
         } // __init__
+        /// <summary>
+        /// Really basicCookieBinNode constructor
+        /// </summary>
         public CookieBinNode() : this(default)   // for setters
         { }
 
@@ -83,40 +94,34 @@ namespace smth
     {
         // prints:
 
-        public static void Print2LinkedList<T>(CookieBinNode<T> bin_node)
-        { Print2LinkedList(bin_node, bin_node.GetLeft() == null); Console.Write("null\n"); }
-
-        private static void Print2LinkedList<T>(CookieBinNode<T> bin_node, bool start_printing)
+        private static string Print2LinkedList<T>(CookieBinNode<T> bin_node, bool start_printing)
         {
+            string return_string = "";
             if (bin_node == null)
-                return;
-
-            if (start_printing)
-            {
-                Console.Write(bin_node.ToString() + " -> ");
-                Print2LinkedList(bin_node.GetRight(), true);
-            } // if
+                ;
+            else if (start_printing)
+                return_string = bin_node.ToString() + " -> " + Print2LinkedList(bin_node.GetRight(), true);
             else
-                Print2LinkedList(bin_node.GetLeft(), (bin_node.GetLeft()).GetLeft() == null);
+                return_string = Print2LinkedList(bin_node.GetLeft(), (bin_node.GetLeft()).GetLeft() == null);
+            return return_string;
         } // Print2LinkedList
 
+        public static string Print2LinkedList<T>(CookieBinNode<T> bin_node)
+        { return "null -> " + Print2LinkedList(bin_node, bin_node.GetLeft() == null) + "null"; }
 
-        public static void Print2LinkedListRight<T>(CookieBinNode<T> bin_node)
-        { Print2LinkedList(bin_node, true); Console.Write("null\n"); }
+        public static string Print2LinkedListRight<T>(CookieBinNode<T> bin_node)
+        { return Print2LinkedList(bin_node, true) + "null"; }
 
 
-        public static void Print2LinkedListLeft<T>(CookieBinNode<T> bin_node)
-        { Console.Write("null"); Print2LinkedListLeftRecursive(bin_node); }
-
-        public static void Print2LinkedListLeftRecursive<T>(CookieBinNode<T> bin_node)
+        public static string Print2LinkedListLeftRecursive<T>(CookieBinNode<T> bin_node)
         {
             if (bin_node != null)
-            {
-                Print2LinkedListLeftRecursive(bin_node.GetLeft());
-                Console.Write(" <- " + bin_node.ToString());
-            } // if
+                return Print2LinkedListLeftRecursive(bin_node.GetLeft()) + " <- " + bin_node.ToString();
+            return "";
         } // Print2LinkedListLeftRecursive
 
+        public static string Print2LinkedListLeft<T>(CookieBinNode<T> bin_node)
+        { return "null" + Print2LinkedListLeftRecursive(bin_node); }
 
 
         // Adds:
@@ -171,19 +176,36 @@ namespace smth
             } // if
         } // AddLeft
 
-        public static void AddToHead<T>(CookieBinNode<T> bin_node)
+        public static void AddToHead<T>(CookieBinNode<T> bin_node, T value)
         {
             if (bin_node == null) return;
             CookieBinNode<T> left = GetLeftest(bin_node);
-            left.SetLeft(bin_node);
-            bin_node.SetRight(left);
+            CookieBinNode<T> newNode = new(value);
+            left.SetLeft(newNode);
+            newNode.SetRight(left);
         } // AddToHead
-        public static void AddToTail<T>(CookieBinNode<T> bin_node)
+        public static void AddToHead<T>(CookieBinNode<T> bin_node, CookieBinNode<T> value)
+        {
+            if (bin_node == null) return;
+            CookieBinNode<T> left = GetLeftest(bin_node);
+            left.SetLeft(value);
+            value.SetRight(left);
+        } // AddToHead
+
+        public static void AddToTail<T>(CookieBinNode<T> bin_node, T value)
         {
             if (bin_node == null) return;
             CookieBinNode<T> right = GetRightest(bin_node);
-            right.SetRight(bin_node);
-            bin_node.SetLeft(right);
+            CookieBinNode<T> newNode = new(value);
+            right.SetRight(newNode);
+            newNode.SetLeft(right);
+        } // AddToTail
+        public static void AddToTail<T>(CookieBinNode<T> bin_node, CookieBinNode<T> value)
+        {
+            if (bin_node == null) return;
+            CookieBinNode<T> right = GetRightest(bin_node);
+            right.SetRight(value);
+            value.SetLeft(right);
         } // AddToTail
 
 
@@ -214,6 +236,8 @@ namespace smth
 
 
     } // CookieHoldingLineHelper
+
+
 
     public class CookieTree<TreeType> : IEnumerable<TreeType>
     {
@@ -432,42 +456,48 @@ namespace smth
 
         // prints:
 
-        public void InOrderTraversal()
-        { InOrderRecursive(this.root); Console.WriteLine(" "); }
-        private void InOrderRecursive(CookieBinNode<TreeType> root)
+        public string InOrderTraversal()
+        { return InOrderRecursive(this.root); }
+        private string InOrderRecursive(CookieBinNode<TreeType> root)
         {
+            string return_value = "";
             if (root != null)
             {
-                InOrderRecursive(root.Left);
-                Console.Write(root.Value + " ");
-                InOrderRecursive(root.Right);
+                return_value += InOrderRecursive(root.Left);
+                return_value += root.Value + " ";
+                return_value += InOrderRecursive(root.Right);
             } // if
+            return return_value;
         } // InOrderRecursive
 
 
-        public void PreOrderTraversal()
-        { PreOrderRecursive(this.root); Console.WriteLine(" "); }
-        private void PreOrderRecursive(CookieBinNode<TreeType> root)
+        public string PreOrderTraversal()
+        { return PreOrderRecursive(this.root); }
+        private string PreOrderRecursive(CookieBinNode<TreeType> root)
         {
+            string return_value = "";
             if (root != null)
             {
-                Console.Write(root.Value + " ");
-                PreOrderRecursive(root.Left);
-                PreOrderRecursive(root.Right);
+                return_value += root.Value + " ";
+                return_value += PreOrderRecursive(root.Left);
+                return_value += PreOrderRecursive(root.Right);
             } // if 
+            return return_value;
         } // PreOrderRecursive
 
 
-        public void PostOrderTraversal()
-        { PostOrderRecursive(this.root); Console.WriteLine(" "); }
-        private void PostOrderRecursive(CookieBinNode<TreeType> root)
+        public string PostOrderTraversal()
+        { return PostOrderRecursive(this.root); }
+        private string PostOrderRecursive(CookieBinNode<TreeType> root)
         {
+            string return_value = "";
             if (root != null)
             {
-                PostOrderRecursive(root.Left);
-                PostOrderRecursive(root.Right);
-                Console.Write(root.Value + " ");
+                return_value += PostOrderRecursive(root.Left);
+                return_value += PostOrderRecursive(root.Right);
+                return_value += root.Value + " ";
             } // if
+            return return_value;
         } // PostOrderRecursive
 
     } // class CookieTree

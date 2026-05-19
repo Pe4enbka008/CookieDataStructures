@@ -16,66 +16,7 @@
     along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 from collections.abc import Iterable
-
-
-class CookieNode(Iterable):
-    def __init__(self, value, next_node=None):
-        """Constructor for CookieNode
-        :param value: value of the node
-        :type value: Any
-        :param next_node: next node
-        :type next_node: CookieNode | None
-        :return: nothing
-        :rtype: None"""
-        self.value = value
-        self.next_node = next_node
-
-    def __iter__(self):
-        """Returns elements one by one for 'for' loops
-        :return: value of the nodes
-        :rtype: Any"""
-        walk_node = self
-        while walk_node:
-            yield walk_node.value
-            walk_node = walk_node.next_node
-
-    def __str__(self):
-        """Returns string value of the nodes
-        :return: string value of the nodes
-        :rtype: str"""
-        return str(self.value)
-
-    # getters-setters
-    def get_value(self):
-        """Returns value of current node
-        :return: string value of the node
-        :rtype: str"""
-        return self.value
-
-    def get_next(self):
-        """Returns next node after current node
-        :return: nodes after current node
-        :rtype: CookieNode | None"""
-        return self.next_node
-
-    def set_value(self, value):
-        """Sets value of current node
-        :param value: value of the current node
-        :type value: Any
-        :return: nothing
-        :rtype: None"""
-        self.value = value
-
-    def set_next(self, next_node):
-        """Sets next node after current node
-        :param next_node: next node
-        :type next_node: CookieNode | None
-        :return: nothing
-        :rtype: None"""
-        self.next_node = next_node
-
-    # end
-
+from CookieNode import CookieNode
 
 
 class CookieNodeList(Iterable):
@@ -138,9 +79,10 @@ class CookieNodeList(Iterable):
         :rtype: Any"""
         if self.head is None or not self.contains(value):
             return 0
-        return self.count_element_duplicates_loop(value, self.head)
+        return CookieNodeList.count_element_duplicates_loop(value, self.head)
 
-    def count_element_duplicates_loop(self, value, nodes):
+    @staticmethod
+    def count_element_duplicates_loop(value, nodes):
         """Returns number of value found in the list given
         :param value: value to count
         :type value: Any
@@ -150,7 +92,7 @@ class CookieNodeList(Iterable):
         :rtype: Any"""
         if nodes is None:
             return 0
-        return (1 if nodes.get_value() == value else 0) + self.count_element_duplicates_loop(value, nodes.get_next())
+        return (1 if nodes.value == value else 0) + CookieNodeList.count_element_duplicates_loop(value, nodes.value)
 
     # getters:
 
@@ -229,10 +171,7 @@ class CookieNodeList(Iterable):
         :type value: Any
         :return: nothing
         :rtype: None"""
-        if isinstance(value, CookieNodeList):
-            new_node = value.head
-        else:
-            new_node = CookieNode(value)
+        new_node = value.head if isinstance(value, CookieNodeList) else CookieNode(value)
 
         if self.head is None:
             self.head = new_node
@@ -249,10 +188,7 @@ class CookieNodeList(Iterable):
         :type value: Any
         :return: nothing
         :rtype: None"""
-        if isinstance(value, CookieNodeList):
-            new_node = value.head
-        else:
-            new_node = CookieNode(value)
+        new_node = value.head if isinstance(value, CookieNodeList) else CookieNode(value)
 
         if self.head is None:
             self.head = new_node
@@ -272,15 +208,12 @@ class CookieNodeList(Iterable):
         :type index: int
         :return: nothing
         :rtype: None"""
-        if isinstance(value, CookieNodeList):
-            new_node = value.head
-        else:
-            new_node = CookieNode(value)
+        new_node = value.head if isinstance(value, CookieNodeList) else CookieNode(value)
 
         if index < 0:
             index = len(self) + index
         elif index == 0:
-            new_node.set_next(self.head)
+            new_node.next_node = self.head
             self.head = new_node
             return
         elif self.head is None:
@@ -294,8 +227,8 @@ class CookieNodeList(Iterable):
         if current is None:
             raise IndexError("Index out of range")
 
-        new_node.set_next(current.get_next())
-        current.set_next(new_node)
+        new_node.next_node = current.next_node
+        current.next_node = new_node
 
     # removers:
 
@@ -308,8 +241,8 @@ class CookieNodeList(Iterable):
         if self.head is None:
             return
 
-        if self.head.get_value() == value:
-            self.head = self.head.get_next()
+        if self.head.value == value:
+            self.head = self.head.next_node
             return
 
         current = self.head
@@ -332,7 +265,7 @@ class CookieNodeList(Iterable):
             index = len(self) + index
 
         if index == 0:
-            self.head = self.head.get_next()
+            self.head = self.head.next_node
             return
 
         current = self.head
@@ -342,7 +275,7 @@ class CookieNodeList(Iterable):
 
         if current is None:
             raise IndexError("Index out of range")
-        current.set_next(current.get_next().get_next())
+        current.next_node = current.next_node().get_next()
 
     def remove_last(self):
         if self.head is None:
@@ -389,13 +322,15 @@ class CookieNodeList(Iterable):
         :rtype: None"""
         self.head = None
 
-    # reverses:
+    # reverse:
 
     def __reversed__(self):
         """reverses a list
         :return: reversed list
         :rtype: CookieNodeList"""
-        if self is None or len(self) <= 1:
+        if self is None:
+            return None
+        if len(self) <= 1:
             return self.copy()
 
         rev = CookieNodeList()

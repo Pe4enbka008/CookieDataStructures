@@ -22,6 +22,7 @@
 namespace smth
 {
     /// <summary>
+    /// This CookieDataStructure requires CookieNode.cs file!
     /// Stack created and better-ed by Cookie :]
     /// </summary>
     /// <typeparam name="T">Type of the stack</typeparam>
@@ -109,7 +110,7 @@ namespace smth
         /// Creates a copy of the object in type of the Nodes  -- not bagrut supported!
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieNode<T>? Copy()
+        public CookieStack<T>? Copy()
         {
             if (this.nodes == null)
                 return null;
@@ -125,7 +126,7 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
-            return return_value;
+            return new CookieStack(return_value);
         } // Copy
 
 
@@ -134,6 +135,28 @@ namespace smth
         /// </summary>
         public void Clear()
         { this.nodes = null; }
+
+
+        /// <summary>
+        /// Creates a copy of the object in type of the CookieStack  -- not bagrut supported!
+        /// </summary>
+        /// <returns>copy of the node list</returns>
+        public CookieStack<T>? Reverse()
+        {
+            if (this.nodes == null) return null;
+            if (this.nodes.Count <= 1) return this.Copy();
+
+            CookieStack<T> rev = new CookieStack<T>();
+            CookieNode<T>? current = this.nodes.Next;
+
+            while (nodes != null)
+            {
+                rev.Push(current);
+                current = current.Next;
+            } // while
+
+            return rev;
+        } // Reverse
 
 
 
@@ -174,6 +197,7 @@ namespace smth
 
 
     /// <summary>
+    /// This CookieDataStructure requires CookieNode.cs file!
     /// Queue created and better-ed by Cookie :]
     /// </summary>
     /// <typeparam name="T">Type of the queue</typeparam>
@@ -296,7 +320,7 @@ namespace smth
         /// Creates a copy of the object in type of the Nodes  -- not bagrut supported!
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieNode<T>? Copy()
+        public CookieQueue<T>? Copy()
         {
             if (this.nodes == null)
                 return null;
@@ -312,7 +336,7 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
-            return return_value;
+            return new CookieQueue(return_value);
         } // Copy
 
 
@@ -321,6 +345,32 @@ namespace smth
         /// </summary>
         public void Clear()
         { this.nodes = null; this.pointer_to_end = null; }
+
+
+
+        /// <summary>
+        /// Creates a copy of the object in type of the CookieQueue  -- not bagrut supported!
+        /// </summary>
+        /// <returns>copy of the node list</returns>
+        public CookieQueue<T>? Reverse()
+        {
+            if (this.nodes == null) return null;
+            if (this.nodes.Count <= 1) return this.Copy();
+
+            CookieStack<T> rev_stack = new CookieStack<T>();
+            CookieNode<T>? current = this.nodes.Next;
+
+            while (nodes != null)
+            {
+                rev_stack.Push(current);
+                current = current.Next;
+            } // while
+
+            CookieQueue<T> rev = new CookieQueue<T>();
+            while (!rev_stack.IsEmpty())
+                rev.Insert(rev_stack.Pop);
+            return rev;
+        } // Reverse
 
 
 
