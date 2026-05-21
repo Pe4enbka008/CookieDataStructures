@@ -201,7 +201,7 @@ namespace smth
                         string suggestion = suggestions[rnd.Next(suggestions.Count)];
                         if (!list.Contains(suggestion) && hunspell.Spell(suggestion) && suggestion.Length > 3 && Char.IsAsciiLetterLower(suggestion[0])) // no repeats
                         {
-                            CookieNodeWorker.Add<string>(list, suggestion);
+                            Add<string>(list, suggestion);
                             length--;
                         } // if
                     } // if
@@ -229,7 +229,7 @@ namespace smth
                 string word = CreateStringList(1).GetValue();
                 while (word.Length < least_letter_count || word.Length > most_letter_count)
                     word = CreateStringList(1).GetValue();
-                CookieNodeWorker.Add<string>(list, word);
+                Add<string>(list, word);
                 length--;
             } // while
             return list;
@@ -252,9 +252,9 @@ namespace smth
             while (length > 0)
             {
                 T number = (T)(object)rnd.Next(-length * 3, length * 3);
-                if (CookieNodeWorker.ContainsElement<T>(list, number) && !repeat)
+                if (ContainsElement<T>(list, number) && !repeat)
                     continue;
-                CookieNodeWorker.Add<T>(list, number);
+                Add<T>(list, number);
                 length--;
             } // while
             return list;
@@ -279,9 +279,9 @@ namespace smth
                 if (Char.IsLetter(letter) && rnd.Next(6) + 1 / 2 == 0)
                     letter = Char.ToUpper(letter);
 
-                if (CookieNodeWorker.ContainsElement<T>(list, letter) && !repeat)
+                if (ContainsElement<char>(list, letter) && !repeat)
                     continue;
-                CookieNodeWorker.Add<char>(list, letter);
+                Add<char>(list, letter);
                 length--;
             } // while
             return list;
@@ -298,7 +298,7 @@ namespace smth
             Random rnd = new Random();
             while (length > 0)
             {
-                CookieNodeWorker.Add<char>(list, rnd.Next(26) % 2 == 0);
+                Add<bool>(list, rnd.Next(26) % 2 == 0);
                 length--;
             } // while
             return list;

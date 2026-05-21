@@ -1,5 +1,4 @@
-﻿using NHunspell;
-using System;
+﻿using System;
 using System.Collections;
 
 /*
@@ -56,13 +55,11 @@ namespace smth
             {
                 CookieNode<ListType> some_node = new(value);
 
-                if (this.count == 0)
+                if (this.head_node == null)
                     this.head_node = some_node;
                 else
                     prev_node.SetNext(some_node);
-
                 prev_node = some_node;
-                this.count++;
             } // foreach
         } // __init__
         /// <summary>
@@ -72,17 +69,15 @@ namespace smth
         {
             CookieNode<ListType> prev_node = null;
 
-            for (int i = 0; i < nodes.Length; i++)
+            for (int i = 0; i < nodes.Count; i++)
             {
                 CookieNode<ListType> some_node = new(nodes.Get(i));
 
-                if (this.count == 0)
+                if (this.head_node == null)
                     this.head_node = some_node;
                 else
                     prev_node.SetNext(some_node);
-
                 prev_node = some_node;
-                this.count++;
             } // foreach
         } // __init__
 
@@ -93,12 +88,7 @@ namespace smth
         /// Return current length of the list
         /// </summary>
         /// <returns>Int represented length</returns>
-        public int Length { get { return this.RecursionCount(this.head_node); } }
-        /// <summary>
-        /// Return current length of the list
-        /// </summary>
-        /// <returns>Int represented length</returns>
-        public int Count { get { return this.RecursionCount(this.head_node); } }
+        public int Count { get { return RecursionCount(this.head_node); } }
 
 
         /// <summary>
@@ -159,7 +149,6 @@ namespace smth
         /// <returns>Int represented index</returns>
         public int GetIndex(ListType item)
         {
-            this.CheckCount();
             if (this.head_node == null) return -1;
 
             CookieNode<ListType> some_node = this.head_node;
@@ -190,7 +179,7 @@ namespace smth
         /// <exception cref="IndexOutOfRangeException">If the index is out-of-range</exception>
         public ListType Get(int index)
         {
-            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
+            if (index < 0 || index >= RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
 
             CookieNode<ListType>? some_node = this.head_node;
             for (; 0 < index; index--)
@@ -375,7 +364,7 @@ namespace smth
         /// <param name="item">Item to add</param>
         public void AddAt(ListType item, int index)
         {
-            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
+            if (index < 0 || index >= RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
 
             CookieNode<ListType> newNode = new(item);
             if (this.head_node == null || index == 0)
@@ -441,7 +430,7 @@ namespace smth
         public void RemoveAt(int index)
         {
             if (this.head_node == null) return;
-            if (index < 0 || index >= this.RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
+            if (index < 0 || index >= RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
 
             // item is head
             if (index == 0)
@@ -478,7 +467,7 @@ namespace smth
             if (first == -1 || counter <= 1)
                 return;
 
-            for (int i = first + 1; i < this.Length && counter > 1; i++)
+            for (int i = first + 1; i < this.Count && counter > 1; i++)
                 if (item.Equals(this.Get(i)))
                 {
                     this.RemoveAt(i);
@@ -524,11 +513,11 @@ namespace smth
         /// <returns>string of the class</returns>
         public string ToString(string split)
         {
-            if (this.nodes == null)
+            if (this.head_node == null)
                 return "[]";
 
             string str = "[";
-            CookieNode<T>? node = this.nodes;
+            CookieNode<ListType>? node = this.head_node;
 
             while (node != null)
             {
@@ -543,7 +532,7 @@ namespace smth
 
 
         // IEnumerable
-        public IEnumerator<ListType> GetEnumerator() // foreach!
+        public IEnumerator<ListType> GetEnumerator() 
         { return head_node.GetEnumerator(); } 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -571,10 +560,10 @@ namespace smth
         /// <param name="list">List to reverse</param>
         public static void Reverse(CookieNodeList<object> list)
         {
-            if (list == null || list.Length <= 1) return;
+            if (list == null || list.Count <= 1) return;
             CookieNodeList<object> copy_list = list.Copy();
             list.Clear();
-            for (int i = 0; i < copy_list.Length; i++)
+            for (int i = 0; i < copy_list.Count; i++)
                 list.Add(copy_list.Get(i));
         } // Reverse
 
