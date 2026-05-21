@@ -142,7 +142,7 @@ namespace smth
 
         // Getters
         /// <summary>
-        /// Idk if works, but get element at index
+        /// Get element at index
         /// </summary>
         /// <param name="index">Index to get value from</param>
         /// <returns>Element at specified index</returns>

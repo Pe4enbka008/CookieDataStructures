@@ -55,7 +55,7 @@ class CookieNodeList(Iterable):
         walk_value = self.head
         while walk_value:
             return_value += str(walk_value)
-            walk_value = walk_value.get_next()
+            walk_value = walk_value.next_node
             if walk_value:
                 return_value += spliter
 
@@ -76,7 +76,7 @@ class CookieNodeList(Iterable):
         :param value: value to count
         :type value: Any
         :return: find an item at index
-        :rtype: Any"""
+        :rtype: int"""
         if self.head is None or not self.contains(value):
             return 0
         return CookieNodeList.count_element_duplicates_loop(value, self.head)
@@ -89,10 +89,10 @@ class CookieNodeList(Iterable):
         :param nodes: list to count upon
         :type nodes: CookieNode | None
         :return: find an item at index
-        :rtype: Any"""
+        :rtype: int"""
         if nodes is None:
             return 0
-        return (1 if nodes.value == value else 0) + CookieNodeList.count_element_duplicates_loop(value, nodes.value)
+        return (1 if nodes.value == value else 0) + CookieNodeList.count_element_duplicates_loop(value, nodes.next_node)
 
     # getters:
 
@@ -116,9 +116,9 @@ class CookieNodeList(Iterable):
         index = 0
         current = self.head
         while current:
-            if current.get_value() == value:
+            if current.value == value:
                 return index
-            current = current.get_next()
+            current = current.next_node
             index += 1
         return -1  # none found
 
@@ -127,9 +127,9 @@ class CookieNodeList(Iterable):
         :param index: index of value to return
         :type index: int
         :return: value found
-        :rtype: str"""
+        :rtype: Any"""
         if self.head is None:
-            return None
+            raise MemoryError("The list is empty")
 
         if index < 0:
             index = len(self) + index
@@ -137,10 +137,18 @@ class CookieNodeList(Iterable):
         current = self.head
         while current:
             if index == 0:
-                return current.get_value()
-            current = current.get_next()
+                return current.value
+            current = current.next_node
             index -= 1
         raise IndexError("Index out of range")
+
+    def get_first(self):
+        """Returns first value, if not found raises IndexError
+        :return: first value in the list
+        :rtype: Any"""
+        if self.head is None:
+            raise MemoryError("The list is empty")
+        return self.get(0)
 
     # special case: contains value
     def contains(self, value):
@@ -159,14 +167,31 @@ class CookieNodeList(Iterable):
         new_list = CookieNodeList()
         current = self.head
         while current:
-            new_list.append(current.get_value())
-            current = current.get_next()
+            new_list.append(current.value)
+            current = current.next_node
         return new_list
 
     # setters:
 
     def append(self, value):
         """Add a value to the end of the node list
+        :param value: value to append to a list
+        :type value: Any
+        :return: nothing
+        :rtype: None"""
+        new_node = CookieNode(value)
+
+        if self.head is None:
+            self.head = new_node
+            return
+
+        current = self.head
+        while current.next_node:
+            current = current.next_node
+        current.next_node = new_node
+
+    def __iadd__(self, value):
+        """Add a value/CookieNodeList to the end of the node list
         :param value: value to append to a list
         :type value: Any
         :return: nothing
@@ -178,9 +203,9 @@ class CookieNodeList(Iterable):
             return
 
         current = self.head
-        while current.get_next():
-            current = current.get_next()
-        current.set_next(new_node)
+        while current.next_node:
+            current = current.next_node
+        current.next_node = new_node
 
     def add(self, value):
         """Add a value to the start of the node list
@@ -196,9 +221,9 @@ class CookieNodeList(Iterable):
 
         current = self.head
         self.head = new_node
-        while new_node.get_next():
-            new_node = new_node.get_next()
-        new_node.set_next(current)
+        while new_node.next_node:
+            new_node = new_node.next_node
+        new_node.next_node = current
 
     def add_at(self, value, index):
         """Add a value to the index requested of the node list
@@ -221,7 +246,7 @@ class CookieNodeList(Iterable):
 
         current = self.head
         while current and index > 1:
-            current = current.get_next()
+            current = current.next_node
             index -= 1
 
         if current is None:
@@ -246,11 +271,11 @@ class CookieNodeList(Iterable):
             return
 
         current = self.head
-        while current.get_next():
-            if current.get_next().get_value() == value:
-                current.set_next(current.get_next().get_next())
+        while current.next_node:
+            if current.next_node.value == value:
+                current.next_node = current.next_node.next_node
                 return
-            current = current.get_next()
+            current = current.next_node
 
     def remove_at(self, index):
         """Removes a value from the list
@@ -270,12 +295,12 @@ class CookieNodeList(Iterable):
 
         current = self.head
         while current and index > 1:
-            current = current.get_next()
+            current = current.next_node
             index -= 1
 
         if current is None:
             raise IndexError("Index out of range")
-        current.next_node = current.next_node().get_next()
+        current.next_node = current.next_node.next_node
 
     def remove_last(self):
         if self.head is None:

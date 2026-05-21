@@ -23,7 +23,8 @@
 namespace smth
 {
     /// <summary>
-    /// Dictinary created bu Cookie  -- not bagrut supported!
+    /// This CookieDataStructure requires CookieNode.cs and CookieNodeList.cs files!
+    /// Dictionary created by Cookie 
     /// </summary>
     /// <typeparam name="TypeKey">Type of the keys</typeparam>
     /// <typeparam name="TypeValue">Types of the values</typeparam>
@@ -104,24 +105,18 @@ namespace smth
 
 
 
+        // Getters:
 
         /// <summary>
-        /// Sets new value at index given, or fully new index
+        /// Get element at index
         /// </summary>
-        /// <param name="key">Key to the value(s)</param>
-        /// <param name="value">The value</param>
-        public void Set(TypeKey key, TypeValue value)
+        /// <param name="index">Index to get value from</param>
+        /// <returns>Element at specified index</returns>
+        public TypeValue this[TypeKey key] // KEYS!
         {
-            if (!ContainsIndex(key))
-            {
-                keys.Append(key);
-                list_of_list_of_values.Append(new CookieNodeList<TypeValue>());
-            } // if
-            int index_in_list_of_lists = keys.Find(key);
-            list_of_list_of_values.Get(index_in_list_of_lists).Append(value);
-        } // Set
-
-
+            get => this.Get(key);
+            set => this.Set(key, value);
+        } // ListType
 
         /// <summary>
         /// Returns the whole list
@@ -130,7 +125,7 @@ namespace smth
         /// <returns>The key list</returns>
         public CookieNodeList<TypeValue> GetList(TypeKey key)
         {
-            if (!ContainsIndex(key))
+            if (!ContainsKey(key))
                 return null;
             return list_of_list_of_values.Get(keys.Find(key));
         } // GetList
@@ -142,12 +137,58 @@ namespace smth
         /// <returns>The first accuring value in the key list</returns>
         public TypeValue Get(TypeKey key)
         {
-            if (ContainsIndex(key))
+            if (ContainsKey(key))
                 return GetList(key).GetFirst();
             return default;
         } // Get
 
 
+
+        // Special case: contains
+
+        /// <summary>
+        /// Searches for key in the dictionary
+        /// </summary>
+        /// <param name="key">Key to the value(s)</param>
+        /// <returns>True if the key found; otherwise, false</returns>
+        public bool ContainsKey(TypeKey key)
+        { return keys.Contains(key); }
+
+        /// <summary>
+        /// Searches for value in key in the dictionary
+        /// </summary>
+        /// <param name="key">Key to the value(s)</param>
+        /// <param name="value">Value to look for</param>
+        /// <returns>True if the key found; otherwise, false</returns>
+        public bool ContainsValueIn(TypeKey key, TypeValue value)
+        {
+            CookieNodeList<TypeValue> values_of_key = list_of_list_of_values.Get(keys.Find(key));
+            return values_of_key.Contains(value);
+        } // ContainsValueIn
+
+
+
+        // Setters:
+
+        /// <summary>
+        /// Sets new value at index given, or fully new index
+        /// </summary>
+        /// <param name="key">Key to the value(s)</param>
+        /// <param name="value">The value</param>
+        public void Set(TypeKey key, TypeValue value)
+        {
+            if (!ContainsKey(key))
+            {
+                keys.Append(key);
+                list_of_list_of_values.Append(new CookieNodeList<TypeValue>());
+            } // if
+            int index_in_list_of_lists = keys.Find(key);
+            list_of_list_of_values.Get(index_in_list_of_lists).Append(value);
+        } // Set
+
+
+
+        // Removers:
 
         /// <summary>
         /// Removes specified key
@@ -155,7 +196,7 @@ namespace smth
         /// <param name="key">Key to the value(s)</param>
         public void Remove(TypeKey key)
         {
-            if (!ContainsIndex(key))
+            if (!ContainsKey(key))
                 return;
             int index_in_list_of_lists = keys.Find(key);
             keys.RemoveAt(index_in_list_of_lists);
@@ -168,7 +209,7 @@ namespace smth
         /// <param name="key">Key to the value(s)</param>
         public void Remove(TypeKey key, TypeValue value)
         {
-            if (!ContainsIndex(key))
+            if (!ContainsKey(key))
                 return;
             int index_in_list_of_lists = keys.Find(key);
             list_of_list_of_values.Get(index_in_list_of_lists).Remove(value);
@@ -180,38 +221,22 @@ namespace smth
         /// <param name="key">Key to the value(s)</param>
         public void RemoveAll(TypeKey key, TypeValue value)
         {
-            if (!ContainsIndex(key))
+            if (!ContainsKey(key))
                 return;
             int index_in_list_of_lists = keys.Find(key);
             list_of_list_of_values.Get(index_in_list_of_lists).RemoveAll(value);
         } // RemoveAll
 
-
-
         /// <summary>
-        /// Searches for key in the dictionary
+        /// Wipes the dictionary clean
         /// </summary>
-        /// <param name="key">Key to the value(s)</param>
-        /// <returns>True if the key found; otherwise, false</returns>
-        public bool ContainsIndex(TypeKey key)
-        { return keys.Contains(key); }
-
-        /// <summary>
-        /// Searches for value in key in the dictionary
-        /// </summary>
-        /// <param name="key">Key to the value(s)</param>
-        /// <param name="value">Value to look for</param>
-        /// <returns>True if the key found; otherwise, false</returns>
-        public bool ContainsValueIn(TypeKey key, TypeValue value)
-        {
-            int index_in_list_of_lists = keys.Find(key);
-            CookieNodeList<TypeValue> values_at_key = list_of_list_of_values.Get(index_in_list_of_lists);
-            return values_at_key.Contains(value);
-        } // ContainsValueIn
+        public void Clear()
+        { this.list_of_list_of_values.Clear(); this.keys.Clear(); }
 
 
 
         // override
+
         /// <summary>
         /// Override of the ToString
         /// </summary>
@@ -220,20 +245,20 @@ namespace smth
         { return ToString(", "); } 
 
         /// <summary>
-        /// override for ToString to - ['value'{split} 'value'{split} 'value'{split} ...]
+        /// override for ToString to - { key: ['value', 'value', 'value', ... ]{split}key: [...] ...}
         /// </summary>
         /// <returns>string of the class</returns>
         public string ToString(string split)
         {
-            string str = "{ ";
-            for (int key = 0; key < keys.Length; key++)
+            string str = "{";
+            for (int key_index = 0; key_index < keys.Length; key_index++)
             {
-                str += $"{keys.Get(key)}: [";
-                CookieNodeList<TypeValue> values = list_of_list_of_values.Get(key);
-                str += values.ToString() + "]";
-                if (key < keys.Length - 1) str += split; 
+                str += $"{keys.Get(key_index)}: ";
+                CookieNodeList<TypeValue> values = list_of_list_of_values.Get(key_index);
+                str += values.ToString();
+                if (key_index < keys.Length - 1) str += split; 
             } // for
-            return str + " }";
+            return str + "}";
         } // override ToString
 
     } // class CookieDict
@@ -263,7 +288,7 @@ namespace smth
         /// <returns>The list</returns>
         public CookieNodeList<T> GetListAs<T>(object key)
         {
-            var list = GetList(key);   // inherited GetList
+            var list = GetList(key); 
             CookieNodeList<T> typedList = new();
             if (list != null)
                 for (int i = 0; i < list.Length; i++)
