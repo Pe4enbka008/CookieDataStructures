@@ -1,7 +1,7 @@
 # CookieDataStructures
 
 Structures made using Nodes  
-Free to use and learn how data is saved and accessed in the computer memory
+Feel free to use and learn how data is saved and accessed in the computer memory
 
 
 ## C#:
