@@ -139,7 +139,8 @@ namespace smth
 
 
     /// <summary>
-    /// Helping class that manipulates with nodes and node lists 
+    /// Helping class that manipulates with nodes
+    /// can be deleted / cut to not require NHunspell: 'creators'
     /// </summary>
     public class CookieNodeWorker
     {
@@ -171,50 +172,21 @@ namespace smth
             return nodes;
         } // ArrayToNodes
 
-        /// <summary>
-        /// Creates node list based on array 
-        /// </summary>
-        /// <typeparam name="T">Any type for the nodes list</typeparam>
-        /// <param name="list">Array to fill with</param>
-        /// <returns>Node list</returns>
-        public static CookieNode<T> NodeListToNodes<T>(CookieNodeList<T>? list)
-        {
-            if (list == null || list.Length == 0)
-                return new CookieNode<T>();
 
-            CookieNode<T> nodes = null, current = null;
-            for (int i = 0; i < list.Length; i++)
-            {
-                T elem = list.Get(i);
-                if (nodes == null)
-                {
-                    nodes = new(elem);
-                    current = nodes;
-                } // if 
-                else
-                {
-                    current.SetNext(new CookieNode<T>(elem));
-                    current = current.GetNext();
-                } // else
-            } // for
-            return nodes;
-        } // NodeListToNodes
-
-
-        // Creaters:
+        // Creators:
         /// <summary>
         /// creates a Node list made of random strings using lib Hunspell
         /// </summary>
         /// <param name="length">Length of the list</param>
         /// <returns>the made list</returns>
-        private static CookieNodeList<string> CreateStringList(int length)
+        public static CookieNode<string> CreateStringList(int length)
         {
             // Downlaod .dic and .aff; in console "dotnet add package NHunspell"
-            CookieNodeList<string> list = new CookieNodeList<string>();
+            CookieNode<string> list = new CookieNode<string>();
             using (Hunspell hunspell = new Hunspell("en_US.aff", "en_US.dic"))
             {
                 Random rnd = new Random();
-                while (list.Length < length)
+                while (length > 0)
                 {
                     int word_length = rnd.Next(3, 9);
                     char[] chars = new char[word_length];
@@ -228,7 +200,10 @@ namespace smth
                     {
                         string suggestion = suggestions[rnd.Next(suggestions.Count)];
                         if (!list.Contains(suggestion) && hunspell.Spell(suggestion) && suggestion.Length > 3 && Char.IsAsciiLetterLower(suggestion[0])) // no repeats
-                            list.Add(suggestion);
+                        {
+                            CookieNodeWorker.Add<string>(list, suggestion);
+                            length--;
+                        } // if
                     } // if
                 } // while
             } // using
@@ -242,21 +217,20 @@ namespace smth
         /// <param name="least_letter_count">the least number of letters in the string, set to 4</param>
         /// <param name="most_letter_count">the most number of letters in the string, set to 100</param>
         /// <returns>the made list</returns>
-        public static CookieNodeList<string> CreateList(int length, int least_letter_count = 4, int most_letter_count = 100)
+        public static CookieNode<string> CreateList(int length, int least_letter_count = 4, int most_letter_count = 100)
         {
             if (least_letter_count > 8)
                 least_letter_count = 0;
             if (most_letter_count < 4)
                 most_letter_count = 10000;
-            CookieNodeList<string> list = CreateStringList(length);
-            int count = 0;
-            while (count != length)
+            CookieNode<string> list = CreateStringList(length);
+            while (length > 0)
             {
-                string word = list.Get(count);
-                while (word.Length > most_letter_count || word.Length < least_letter_count)
-                    word = CreateStringList(1).Get(0);
-                list.AddAt(word, count);
-                count++;
+                string word = CreateStringList(1).GetValue();
+                while (word.Length < least_letter_count || word.Length > most_letter_count)
+                    word = CreateStringList(1).GetValue();
+                CookieNodeWorker.Add<string>(list, word);
+                length--;
             } // while
             return list;
         } // CreateList - string
@@ -264,24 +238,24 @@ namespace smth
         /// <summary>
         /// creates a Node list made of random int/double/float numbers using lib Random
         /// </summary>
-        /// <typeparam name="T">int double or float</typeparam>
+        /// <typeparam name="T">int, double or float</typeparam>
         /// <param name="length">Length of the list</param>
         /// <param name="repeat">if reapeating is allowed</param>
         /// <returns>the made list</returns>
-        public static CookieNodeList<T> CreateList<T>(int length, bool repeat = true)
+        public static CookieNode<T> CreateList<T>(int length, bool repeat = true)
         {
             if ((typeof(T) != typeof(int) && typeof(T) != typeof(float) && typeof(T) != typeof(double)) || length == 0)
-                return new CookieNodeList<T>();
+                return new CookieNode<T>();
 
-            CookieNodeList<T> list = new CookieNodeList<T>();
+            CookieNode<T> list = new CookieNode<T>();
             Random rnd = new Random();
-            while (list.Length < length)
+            while (length > 0)
             {
-                T number = (T)(object)rnd.Next(length * 3);
-                if (rnd.Next(4) % 2 == 0)
-                    number = (T)(object)(-1 * (int)(object)number);
-                if (!list.Contains(number) && !repeat) // no repeats
-                    list.Append(number);
+                T number = (T)(object)rnd.Next(-length * 3, length * 3);
+                if (CookieNodeWorker.ContainsElement<T>(list, number) && !repeat)
+                    continue;
+                CookieNodeWorker.Add<T>(list, number);
+                length--;
             } // while
             return list;
         } // CreateList - int; double; float
@@ -292,22 +266,23 @@ namespace smth
         /// <param name="length">Length of the list</param>
         /// <param name="repeat">if reapeating is allowed</param>
         /// <returns>the made list</returns>
-        public static CookieNodeList<char> CreateList(int length, bool repeat = true)
+        public static CookieNode<char> CreateList(int length, bool repeat = true)
         {
             if (length > 26 * 2)
                 repeat = true;
 
-            CookieNodeList<char> list = new CookieNodeList<char>();
+            CookieNode<char> list = new CookieNode<char>();
             Random rnd = new Random();
-            while (list.Length < length)
+            while (length > 0)
             {
                 char letter = (char)('a' + rnd.Next(26));
                 if (Char.IsLetter(letter) && rnd.Next(6) + 1 / 2 == 0)
                     letter = Char.ToUpper(letter);
 
-                if (!repeat && list.Contains(letter))
+                if (CookieNodeWorker.ContainsElement<T>(list, letter) && !repeat)
                     continue;
-                list.Add(letter);
+                CookieNodeWorker.Add<char>(list, letter);
+                length--;
             } // while
             return list;
         } // CreateList - char
@@ -317,12 +292,15 @@ namespace smth
         /// </summary>
         /// <param name="length">Length of the list</param>
         /// <returns>the made list</returns>
-        public static CookieNodeList<bool> CreateList(int length)
+        public static CookieNode<bool> CreateList(int length)
         {
-            CookieNodeList<bool> list = new CookieNodeList<bool>();
+            CookieNode<bool> list = new CookieNode<bool>();
             Random rnd = new Random();
-            while (list.Length < length)
-                list.Add(rnd.Next(26) % 2 == 0);
+            while (length > 0)
+            {
+                CookieNodeWorker.Add<char>(list, rnd.Next(26) % 2 == 0);
+                length--;
+            } // while
             return list;
         } // CreateList - bool
 
@@ -334,14 +312,14 @@ namespace smth
         /// <typeparam name="T">Type of the node link</typeparam>
         /// <param name="nodes">Head node</param>
         /// <returns>string that's made of the node values</returns>
-        public static string MakeNodeListPrintable<T>(CookieNode<T>? nodes)
+        public static string MakeNodesPrintable<T>(CookieNode<T>? nodes)
         {
             string str = "-->";
             while (nodes != null)
             {
                 str += $"({nodes.GetValue()})-->";
                 nodes = nodes.GetNext();
-            }
+            } // while
             str += "NULL";
             return str;
         } // MakeNodeListPrintable 
@@ -358,7 +336,7 @@ namespace smth
         } // RecursionSum
 
         /// <summary>
-        /// The function checks if th element in in the given list
+        /// The function checks if the element in in the given list
         /// </summary>
         /// <typeparam name="T">Type of the list and element</typeparam>
         /// <param name="nodes">Node list</param>
@@ -402,11 +380,11 @@ namespace smth
 
         // Count:
         /// <summary>
-            /// Recursivly counts number of the 
-            /// </summary>
-            /// <typeparam name="T"></typeparam>
-            /// <param name="nodes"></param>
-            /// <returns></returns>
+        /// Recursively counts number of nodes linked
+        /// </summary>
+        /// <typeparam name="T">type of the node list</typeparam>
+        /// <param name="nodes">nodes</param>
+        /// <returns>number of nodes linked</returns>
         public static int RecursionCount<T>(CookieNode<T>? nodes)
         {
             if (nodes == null) return 0;
@@ -431,7 +409,7 @@ namespace smth
         } // RecursionCountElement
         
 
-        // Add/Remove
+        // Add/Remove:
         /// <summary>
         /// Removes item from the list
         /// </summary>
