@@ -5,7 +5,7 @@ Free to use and learn how data is saved and accessed in the computer memory
 
 
 ## C#:
-Structures made using Nodes in C# lenguage
+Structures made using Nodes in C# language
 
 ### fillerAdditions
 
@@ -13,6 +13,9 @@ fillerAdditions folder contains files for hunspell - library to create real word
 
 For it to work place the files into your-project/bin/Debug/net9.0
 
+
+## Python:
+Structures made using Nodes in Python language
 
 
 ## License
