@@ -1,6 +1,6 @@
 # CookieDataStructures
 
-Structures made using Nodes
+Structures made using Nodes  
 Free to use and learn how data is saved and accessed in the computer memory
 
 
