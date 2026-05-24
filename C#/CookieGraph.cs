@@ -27,7 +27,7 @@ namespace smth
     /// Tuple created and better-ed by Cookie :]
     /// </summary>
     /// <typeparam name="GraphType">Type of the node tuple</typeparam>
-    public class CookieGraph<GraphType> : IEnumerable<GraphType>
+    public class CookieGraph<GraphType>// : IEnumerable<GraphType>
     {
         private CookieNode<GraphType> head_node;
 

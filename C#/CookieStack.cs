@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 /*
     CookieDataStructure
@@ -25,47 +26,42 @@ namespace smth
     /// This CookieDataStructure requires CookieNode.cs file!
     /// Stack created and better-ed by Cookie :]
     /// </summary>
-    /// <typeparam name="T">Type of the stack</typeparam>
-    public class CookieStack<T>
+    /// <typeparam name="StackType">Type of the stack</typeparam>
+    public class CookieStack<StackType> : IEnumerable<StackType>
     {
-        private CookieNode<T>? nodes;
+        private CookieNode<StackType>? head_node;
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieStack() { this.nodes = null; }
+        public CookieStack() { this.head_node = null; }
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieStack(T value) { this.nodes = new CookieNode<T>(value); }
-
-        /// <summary>
-        /// Class constructor  -- not bagrut supported!
-        /// </summary>
-        public CookieStack(CookieNodeList<T> list) { this.nodes = CookieNodeWorker.NodeListToNodes(list); }
+        public CookieStack(StackType value) { this.head_node = new CookieNode<StackType>(value); }
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieStack(CookieNode<T> nodes) { this.nodes = nodes; }
+        public CookieStack(CookieNode<StackType>? nodes) { this.head_node = nodes; }
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieStack(T[] list) { this.nodes = CookieNodeWorker.ArrayToNodes(list); }
+        public CookieStack(StackType[] list) { this.head_node = CookieNodeWorker.ArrayToNodes(list); }
 
 
         /// <summary>
         /// Returns if the stack is empty
         /// </summary>
         /// <returns>true is the stack is empty</returns>
-        public bool IsEmpty() { return this.nodes == null; }
+        public bool IsEmpty() { return this.head_node == null; }
 
         /// <summary>
-        /// Returns stack's length  -- not bagrut supported!
+        /// Returns stack's length 
         /// </summary>
-        public int Length { get { return CookieNodeWorker.RecursionCount<T>(this.nodes); } }
+        public int Length { get { return CookieNodeWorker.RecursionCount<StackType>(this.head_node); } }
 
 
         // Getters-Setters
@@ -73,51 +69,51 @@ namespace smth
         /// FILO (FIRST IN ; LAST OUT) - puts the value in front
         /// </summary>
         /// <param name="value">Value to save</param>
-        public void Push(T value) 
-        { this.nodes = new CookieNode<T>(value, this.nodes); }
+        public void Push(StackType value) 
+        { this.head_node = new CookieNode<StackType>(value, this.head_node); }
 
 
         /// <summary>
         /// LIFO (LAST IN ; FIRST OUT) - gets the front value ; could be null
         /// </summary>
         /// <returns>The top (last added) value</returns>
-        public T? PopValue()
+        public StackType? PopValue()
         {
-            if (this.nodes == null)
-                return default;  // cause.... Just cause >:]
+            if (this.head_node == null)
+                throw new Exception("No values to pop");
 
-            CookieNode<T> node = this.nodes;
-            this.nodes = node.GetNext();
+            CookieNode<StackType> node = this.head_node;
+            this.head_node = node.GetNext();
             node.Next = null;
             return node.Value;
         } // Pop
 
         /// <summary>
-        /// Easier way of Pop function :]  -- not bagrut supported!
+        /// Easier way of Pop function :]
         /// </summary>
-        public T? Pop { get { return this.PopValue(); } }
+        public StackType? Pop { get { return this.PopValue(); } }
 
 
         /// <summary>
         /// Gets the top value, if the stack is empty, returns default of the type
         /// </summary>
         /// <returns>value of the top</returns>
-        public T? GetTop()
-        { return this.nodes != null ? this.nodes.Value : default; } // if (this.nodes != null) return this.nodes.Value; return default; 
+        public StackType? GetTop()
+        { return this.head_node != null ? this.head_node.Value : throw new Exception("No values to pop"); } 
 
 
         /// <summary>
-        /// Creates a copy of the object in type of the Nodes  -- not bagrut supported!
+        /// Creates a copy of the object
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieStack<T>? Copy()
+        public CookieStack<StackType>? Copy()
         {
-            if (this.nodes == null)
+            if (this.head_node == null)
                 return null;
 
-            CookieNode<T> return_value = new CookieNode<T>(this.nodes.Value);
-            CookieNode<T> current = return_value;
-            CookieNode<T>? nodes = this.nodes.Next;
+            CookieNode<StackType> return_value = new CookieNode<StackType>(this.head_node.Value);
+            CookieNode<StackType> current = return_value;
+            CookieNode<StackType>? nodes = this.head_node.Next;
 
             while (nodes != null)
             {
@@ -126,7 +122,7 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
-            return new CookieStack(return_value);
+            return new(return_value);
         } // Copy
 
 
@@ -134,33 +130,66 @@ namespace smth
         /// Clears the Stack
         /// </summary>
         public void Clear()
-        { this.nodes = null; }
+        { this.head_node = null; }
 
 
         /// <summary>
-        /// Creates a copy of the object in type of the CookieStack  -- not bagrut supported!
+        /// Creates a copy of the object in type of the CookieStack
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieStack<T>? Reverse()
+        public CookieStack<StackType>? Reverse()
         {
-            if (this.nodes == null) return null;
-            if (this.nodes.Count <= 1) return this.Copy();
+            if (this.head_node == null) return null;
+            if (this.Length <= 1) return this.Copy();
 
-            CookieStack<T> rev = new CookieStack<T>();
-            CookieNode<T>? current = this.nodes.Next;
+            CookieStack<StackType> rev = new CookieStack<StackType>();
+            CookieNode<StackType>? current = this.head_node;
 
-            while (nodes != null)
+            while (current != null)
             {
-                rev.Push(current);
+                rev.Push(current.Value);
                 current = current.Next;
             } // while
-
             return rev;
         } // Reverse
 
 
 
+        /// <summary>
+        /// Moves front to back once
+        /// </summary>
+        public void RotateLeft()
+        { if (!this.IsEmpty()) this.Push(this.Pop); }
+
+        /// <summary>
+        /// Moves back to front once
+        /// </summary>
+        public void RotateRight()
+        {
+            if (this.IsEmpty() || this.head_node.Next == null)  // there is one value in
+                return;
+
+            CookieNode<StackType> current = this.head_node;
+            while (current.Next.Next != null)
+                current = current.Next;
+            CookieNode<StackType> last = current.Next;
+            current.SetNext(null);
+
+            last.SetNext(this.head_node);
+            this.head_node = last;
+        } // RotateRight
+
+
+
         // override
+
+        // IEnumerable
+        public IEnumerator<StackType> GetEnumerator()
+        { return this.head_node.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        // object 
+
         /// <summary>
         /// override for ToString to - ['value', 'value', 'value', ...]
         /// </summary>
@@ -176,11 +205,11 @@ namespace smth
         /// <returns>string of the class</returns>
         public string ToString(string split)
         {
-            if (this.nodes == null)
+            if (this.head_node == null)
                 return "[]";
 
             string str = "[";
-            CookieNode<T>? node = this.nodes;
+            CookieNode<StackType>? node = this.head_node;
 
             while (node != null)
             {

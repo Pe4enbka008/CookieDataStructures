@@ -90,6 +90,13 @@ namespace smth
         /// <returns>Int represented length</returns>
         public int Count { get { return RecursionCount(this.head_node); } }
 
+        /// <summary>
+        /// Return if the list is empty
+        /// </summary>
+        /// <returns>Int represented length</returns>
+        public bool IsEmpty()
+        { return this.head_node == null; }
+
 
         /// <summary>
         /// Counts number of nodes in the node list! Recursively

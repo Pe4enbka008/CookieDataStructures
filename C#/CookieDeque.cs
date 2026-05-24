@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 /*
     CookieDataStructure
@@ -25,57 +26,45 @@ namespace smth
     /// This CookieDataStructure requires CookieNode.cs file!
     /// Queue created and better-ed by Cookie :]
     /// </summary>
-    /// <typeparam name="T">Type of the queue</typeparam>
-    public class CookieDeque<T>
+    /// <typeparam name="DequeType">Type of the queue</typeparam>6
+    public class CookieDeque<DequeType> : IEnumerable<DequeType>
     {
-        private CookieNode<T>? nodes;
-        private CookieNode<T>? pointer_to_end;
+        private CookieNode<DequeType>? head_node;
+        private CookieNode<DequeType>? last_node;
 
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieQueue() { this.nodes = null; this.pointer_to_end = null; }
+        public CookieDeque() { this.head_node = null; this.last_node = null; }
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieQueue(T value) 
-        { this.nodes = new CookieNode<T>(value); this.pointer_to_end = this.nodes; }
+        public CookieDeque(DequeType value) 
+        { this.head_node = new CookieNode<DequeType>(value); this.last_node = this.head_node; }
 
 
         /// <summary>
-        /// Class constructor  -- not bagrut supported!
+        /// Class constructor
         /// </summary>
-        public CookieQueue(CookieNodeList<T> list) 
+        public CookieDeque(CookieNode<DequeType> nodes) 
         { 
-            this.nodes = CookieNodeWorker.NodeListToNodes(list);
-            this.pointer_to_end = this.nodes;
-            while (this.pointer_to_end.Next != null)
-                this.pointer_to_end = this.pointer_to_end.Next; // got to the last
-        } // __init__
-
-
-        /// <summary>
-        /// Class constructor
-        /// </summary>
-        public CookieQueue(CookieNode<T> nodes) 
-        { 
-            this.nodes = nodes;
-            this.pointer_to_end = this.nodes;
-            while (this.pointer_to_end.Next != null)
-                this.pointer_to_end = this.pointer_to_end.Next; // got to the last
+            this.head_node = nodes;
+            this.last_node = this.head_node;
+            while (this.last_node.Next != null)
+                this.last_node = this.last_node.Next; // got to the last
         } // __init__
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieQueue(T[] list) 
+        public CookieDeque(DequeType[] list) 
         { 
-            this.nodes = CookieNodeWorker.ArrayToNodes(list);
-            this.pointer_to_end = this.nodes;
-            while (this.pointer_to_end.Next != null)
-                this.pointer_to_end = this.pointer_to_end.Next; // got to the last
+            this.head_node = CookieNodeWorker.ArrayToNodes(list);
+            this.last_node = this.head_node;
+            while (this.last_node.Next != null)
+                this.last_node = this.last_node.Next; // got to the last
         } // __init__
 
 
@@ -84,75 +73,105 @@ namespace smth
         /// </summary>
         /// <returns>true is the queue is empty</returns>
         public bool IsEmpty() 
-        { return this.nodes == null && this.pointer_to_end == null; }
+        { return this.head_node == null && this.last_node == null; }
 
         /// <summary>
-        /// Returns queue's length  -- not bagrut supported!
+        /// Returns queue's length 
         /// </summary>
-        public int Length { get { return CookieNodeWorker.RecursionCount<T>(this.nodes); } }
+        public int Length { get { return CookieNodeWorker.RecursionCount<DequeType>(this.head_node); } }
+
 
 
         // Getters-Setters
         /// <summary>
-        /// FIFO (FIRST IN ; FIRST OUT) - puts the value at the end
+        /// Puts the value at the start
         /// </summary>
         /// <param name="value">Value to save</param>
-        public void Insert(T value)
-        { 
-            if (this.nodes == null) // queue is empty
+        public void PushFront(DequeType value)
+        {
+            if (this.head_node == null) // queue is empty
             {
-                this.nodes = new CookieNode<T>(value);
-                this.pointer_to_end = this.nodes;
+                this.head_node = new(value);
+                this.last_node = this.head_node;
                 return;
             } // if 
-            this.pointer_to_end.SetNext(new CookieNode<T>(value));
-            this.pointer_to_end = this.pointer_to_end.Next;
-        } // Insert
-
+            CookieNode<DequeType> node = new(value, this.head_node);
+            this.head_node = node;
+        } // PushFront
 
         /// <summary>
-        /// FIFO (FIRST IN ; FIRST OUT) - gets the front value ; could be null
+        /// Gets the front value ; could be null
         /// </summary>
         /// <returns>The top (first added) value</returns>
-        public T? RemoveValue()
+        public DequeType? PopFront()
         {
-            if (this.nodes == null)
-                return default;  // cause.... Just cause >:]
+            if (this.head_node == null)
+                throw new Exception("No values to pop");
 
-            CookieNode<T> node = this.nodes;
-            if (node.GetNext() == null)
-                this.pointer_to_end = null;
-            this.nodes = node.GetNext();
+            CookieNode<DequeType> node = this.head_node;
+            if (node.Next == null)
+                this.last_node = null;
+            this.head_node = node.GetNext();
             node.Next = null;
             return node.Value;
-        } // Remove
+        } // PopFront
+
 
         /// <summary>
-        /// Easier way of Remove function :]  -- not bagrut supported!
+        /// Puts the value at the end
         /// </summary>
-        public T? Remove { get { return this.RemoveValue(); } }
+        /// <param name="value">Value to save</param>
+        public void PushBack(DequeType value)
+        {
+            if (this.head_node == null) // queue is empty
+            {
+                this.head_node = new(value);
+                this.last_node = this.head_node;
+                return;
+            } // if 
+            this.last_node.SetNext(new(value));
+            this.last_node = this.last_node.Next;
+        } // PushBack
+
+        /// <summary>
+        /// Gets the last value ; could be null
+        /// </summary>
+        /// <returns>The top (first added) value</returns>
+        public DequeType? PopBack()
+        {
+            if (this.head_node == null)
+                throw new Exception("No values to pop");
+
+            CookieNode<DequeType> node = this.last_node;
+            this.last_node = this.head_node;
+            while (this.last_node.Next != node)
+                this.last_node = this.last_node.Next;
+            this.last_node.Next = null;
+            return node.Value;
+        } // PopBack
+
 
 
         /// <summary>
         /// Gets the top value, if the stack is empty, returns default of the type
         /// </summary>
         /// <returns>value of the top</returns>
-        public T? GetTop()
-        { return this.nodes != null ? this.nodes.Value : default; } // if (this.nodes != null) return this.nodes.Value; return default; 
+        public DequeType? GetTop()
+        { return this.head_node != null ? this.head_node.Value : throw new Exception("No values to pop"); } 
 
 
         /// <summary>
-        /// Creates a copy of the object in type of the Nodes  -- not bagrut supported!
+        /// Creates a copy of the object
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieQueue<T>? Copy()
+        public CookieDeque<DequeType>? Copy()
         {
-            if (this.nodes == null)
+            if (this.head_node == null)
                 return null;
 
-            CookieNode<T> return_value = new CookieNode<T>(this.nodes.Value);
-            CookieNode<T> current = return_value;
-            CookieNode<T>? nodes = this.nodes.Next;
+            CookieNode<DequeType> return_value = new CookieNode<DequeType>(this.head_node.Value);
+            CookieNode<DequeType> current = return_value;
+            CookieNode<DequeType>? nodes = this.head_node.Next;
 
             while (nodes != null)
             {
@@ -161,7 +180,7 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
-            return new CookieQueue(return_value);
+            return new(return_value);
         } // Copy
 
 
@@ -169,37 +188,55 @@ namespace smth
         /// Clears the Queue
         /// </summary>
         public void Clear()
-        { this.nodes = null; this.pointer_to_end = null; }
+        { this.head_node = null; this.last_node = null; }
 
 
 
         /// <summary>
-        /// Creates a copy of the object in type of the CookieQueue  -- not bagrut supported!
+        /// Creates a copy of the object in type of the CookieQueue 
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieQueue<T>? Reverse()
+        public CookieDeque<DequeType>? Reverse()
         {
-            if (this.nodes == null) return null;
-            if (this.nodes.Count <= 1) return this.Copy();
+            if (this.head_node == null) return null;
+            if (this.Length <= 1) return this.Copy();
 
-            CookieStack<T> rev_stack = new CookieStack<T>();
-            CookieNode<T>? current = this.nodes.Next;
+            CookieDeque<DequeType> rev = new();
+            CookieNode<DequeType>? current = this.head_node;
 
-            while (nodes != null)
+            while (current != null)
             {
-                rev_stack.Push(current);
+                rev.PushFront(current.Value);
                 current = current.Next;
             } // while
-
-            CookieQueue<T> rev = new CookieQueue<T>();
-            while (!rev_stack.IsEmpty())
-                rev.Insert(rev_stack.Pop);
             return rev;
         } // Reverse
 
 
 
+        /// <summary>
+        /// Moves front to back once
+        /// </summary>
+        public void RotateLeft()
+        { if (!this.IsEmpty()) this.PushBack(this.PopFront()); }
+ 
+        /// <summary>
+        /// Moves back to front once
+        /// </summary>
+        public void RotateRight()
+        { if (!this.IsEmpty()) this.PushFront(this.PopBack()); } 
+
+
+
         // override
+
+        // IEnumerable
+        public IEnumerator<DequeType> GetEnumerator()
+        { return this.head_node.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        // object 
+
         /// <summary>
         /// override for ToString to - ['value', 'value', 'value', ...]
         /// </summary>
@@ -213,11 +250,11 @@ namespace smth
         /// <returns>string of the class</returns>
         public string ToString(string split)
         {
-            if (this.nodes == null)
+            if (this.head_node == null)
                 return "[]";
 
             string str = "[";
-            CookieNode<T>? node = this.nodes;
+            CookieNode<DequeType>? node = this.head_node;
 
             while (node != null)
             {
@@ -230,7 +267,7 @@ namespace smth
             return str + "]";
         } // override ToString
 
-    } // class CookieQueue
+    } // class CookieDeque
 
 
 } // namespace smth

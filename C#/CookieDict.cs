@@ -26,27 +26,27 @@ namespace smth
     /// This CookieDataStructure requires CookieNode.cs and CookieNodeList.cs files!
     /// Dictionary created by Cookie 
     /// </summary>
-    /// <typeparam name="TypeKey">Type of the keys</typeparam>
-    /// <typeparam name="TypeValue">Types of the values</typeparam>
-    public class CookieDict<TypeKey, TypeValue>
+    /// <typeparam name="KeyType">Type of the keys</typeparam>
+    /// <typeparam name="ValueType">Types of the values</typeparam>
+    public class CookieDict<KeyType, ValueType>
     {
-        private CookieNodeList<TypeKey> keys;
-        private CookieNodeList<CookieNodeList<TypeValue>> list_of_list_of_values;
+        private CookieNodeList<KeyType> keys;
+        private CookieNodeList<CookieNodeList<ValueType>> list_of_list_of_values;
         public CookieDict()
         {
-            keys = new CookieNodeList<TypeKey>();
-            list_of_list_of_values = new CookieNodeList<CookieNodeList<TypeValue>>();
+            keys = new CookieNodeList<KeyType>();
+            list_of_list_of_values = new CookieNodeList<CookieNodeList<ValueType>>();
         } // __init__
 
         /// <summary>
         /// Returns the System List of the Keys
         /// </summary>
-        public List<TypeKey> Keys
+        public List<KeyType> Keys
         {
             get
             {
-                List<TypeKey> all_keys = new();
-                for (int i = 0; i < keys.Length; i++)
+                List<KeyType> all_keys = new();
+                for (int i = 0; i < keys.Count; i++)
                     all_keys.Add(keys.Get(i));
                 return all_keys;
             } // get
@@ -55,12 +55,12 @@ namespace smth
         /// <summary>
         /// Returns the CookieNodeList of the Keys
         /// </summary>
-        public CookieNodeList<TypeKey> CookieKeys
+        public CookieNodeList<KeyType> CookieKeys
         {
             get
             {
-                CookieNodeList<TypeKey> all_keys = new();
-                for (int i = 0; i < keys.Length; i++)
+                CookieNodeList<KeyType> all_keys = new();
+                for (int i = 0; i < keys.Count; i++)
                     all_keys.Append(keys.Get(i));
                 return all_keys;
             } // get
@@ -70,15 +70,15 @@ namespace smth
         /// <summary>
         /// Returns the System List of the Values
         /// </summary>
-        public List<TypeValue> Values
+        public List<ValueType> Values
         {
             get
             {
-                List<TypeValue> all_values = new();
-                for (int i = 0; i < list_of_list_of_values.Length; i++)
+                List<ValueType> all_values = new();
+                for (int i = 0; i < list_of_list_of_values.Count; i++)
                 {
-                    CookieNodeList<TypeValue> this_list = list_of_list_of_values.Get(i);
-                    for (int t = 0; t < this_list.Length; t++)
+                    CookieNodeList<ValueType> this_list = list_of_list_of_values.Get(i);
+                    for (int t = 0; t < this_list.Count; t++)
                         all_values.Add(this_list.Get(t));
                 } // for
                 return all_values;
@@ -88,20 +88,25 @@ namespace smth
         /// <summary>
         /// Returns the CookieNodeList of the Values
         /// </summary>
-        public CookieNodeList<TypeValue> CookieValues
+        public CookieNodeList<ValueType> CookieValues
         {
             get
             {
-                CookieNodeList<TypeValue> all_values = new();
-                for (int i = 0; i < list_of_list_of_values.Length; i++)
+                CookieNodeList<ValueType> all_values = new();
+                for (int i = 0; i < list_of_list_of_values.Count; i++)
                 {
-                    CookieNodeList<TypeValue> this_list = list_of_list_of_values.Get(i);
-                    for (int t = 0; t < this_list.Length; t++)
+                    CookieNodeList<ValueType> this_list = list_of_list_of_values.Get(i);
+                    for (int t = 0; t < this_list.Count; t++)
                         all_values.Append(this_list.Get(t));
                 } // for
                 return all_values;
             } // get
         } // Values
+
+
+
+        public bool IsEmpty()
+        { return this.keys.IsEmpty() && this.list_of_list_of_values.IsEmpty(); } 
 
 
 
@@ -112,7 +117,7 @@ namespace smth
         /// </summary>
         /// <param name="index">Index to get value from</param>
         /// <returns>Element at specified index</returns>
-        public TypeValue this[TypeKey key] // KEYS!
+        public ValueType this[KeyType key] 
         {
             get => this.Get(key);
             set => this.Set(key, value);
@@ -123,24 +128,35 @@ namespace smth
         /// </summary>
         /// <param name="key">Key to the value(s)</param>
         /// <returns>The key list</returns>
-        public CookieNodeList<TypeValue> GetList(TypeKey key)
-        {
-            if (!ContainsKey(key))
-                return null;
-            return list_of_list_of_values.Get(keys.Find(key));
-        } // GetList
+        public CookieNodeList<ValueType> GetList(KeyType key)
+        { if (ContainsKey(key)) return list_of_list_of_values.Get(keys.Find(key)); throw new KeyNotFoundException(); }
 
         /// <summary>
         /// Gets only one (first) value
         /// </summary>
         /// <param name="key">Key to the value(s)</param>
         /// <returns>The first accuring value in the key list</returns>
-        public TypeValue Get(TypeKey key)
+        public ValueType Get(KeyType key)
+        { if (ContainsKey(key)) return GetList(key).GetFirst(); throw new KeyNotFoundException(); }
+
+
+        // Setters:
+
+        /// <summary>
+        /// Sets new value at index given, or fully new index
+        /// </summary>
+        /// <param name="key">Key to the value(s)</param>
+        /// <param name="value">The value</param>
+        public void Set(KeyType key, ValueType value)
         {
-            if (ContainsKey(key))
-                return GetList(key).GetFirst();
-            return default;
-        } // Get
+            if (!ContainsKey(key))
+            {
+                keys.Append(key);
+                list_of_list_of_values.Append(new CookieNodeList<ValueType>());
+            } // if
+            int index_in_list_of_lists = keys.Find(key);
+            list_of_list_of_values.Get(index_in_list_of_lists).Append(value);
+        } // Set
 
 
 
@@ -151,7 +167,7 @@ namespace smth
         /// </summary>
         /// <param name="key">Key to the value(s)</param>
         /// <returns>True if the key found; otherwise, false</returns>
-        public bool ContainsKey(TypeKey key)
+        public bool ContainsKey(KeyType key)
         { return keys.Contains(key); }
 
         /// <summary>
@@ -160,31 +176,11 @@ namespace smth
         /// <param name="key">Key to the value(s)</param>
         /// <param name="value">Value to look for</param>
         /// <returns>True if the key found; otherwise, false</returns>
-        public bool ContainsValueIn(TypeKey key, TypeValue value)
+        public bool ContainsValueIn(KeyType key, ValueType value)
         {
-            CookieNodeList<TypeValue> values_of_key = list_of_list_of_values.Get(keys.Find(key));
+            CookieNodeList<ValueType> values_of_key = list_of_list_of_values.Get(keys.Find(key));
             return values_of_key.Contains(value);
         } // ContainsValueIn
-
-
-
-        // Setters:
-
-        /// <summary>
-        /// Sets new value at index given, or fully new index
-        /// </summary>
-        /// <param name="key">Key to the value(s)</param>
-        /// <param name="value">The value</param>
-        public void Set(TypeKey key, TypeValue value)
-        {
-            if (!ContainsKey(key))
-            {
-                keys.Append(key);
-                list_of_list_of_values.Append(new CookieNodeList<TypeValue>());
-            } // if
-            int index_in_list_of_lists = keys.Find(key);
-            list_of_list_of_values.Get(index_in_list_of_lists).Append(value);
-        } // Set
 
 
 
@@ -194,7 +190,7 @@ namespace smth
         /// Removes specified key
         /// </summary>
         /// <param name="key">Key to the value(s)</param>
-        public void Remove(TypeKey key)
+        public void Remove(KeyType key)
         {
             if (!ContainsKey(key))
                 return;
@@ -207,7 +203,7 @@ namespace smth
         /// Removes specified value from key
         /// </summary>
         /// <param name="key">Key to the value(s)</param>
-        public void Remove(TypeKey key, TypeValue value)
+        public void Remove(KeyType key, ValueType value)
         {
             if (!ContainsKey(key))
                 return;
@@ -219,7 +215,7 @@ namespace smth
         /// Removes all values like given from key
         /// </summary>
         /// <param name="key">Key to the value(s)</param>
-        public void RemoveAll(TypeKey key, TypeValue value)
+        public void RemoveAll(KeyType key, ValueType value)
         {
             if (!ContainsKey(key))
                 return;
@@ -251,12 +247,12 @@ namespace smth
         public string ToString(string split)
         {
             string str = "{";
-            for (int key_index = 0; key_index < keys.Length; key_index++)
+            for (int key_index = 0; key_index < keys.Count; key_index++)
             {
                 str += $"{keys.Get(key_index)}: ";
-                CookieNodeList<TypeValue> values = list_of_list_of_values.Get(key_index);
+                CookieNodeList<ValueType> values = list_of_list_of_values.Get(key_index);
                 str += values.ToString();
-                if (key_index < keys.Length - 1) str += split; 
+                if (key_index < keys.Count - 1) str += split; 
             } // for
             return str + "}";
         } // override ToString
@@ -291,7 +287,7 @@ namespace smth
             var list = GetList(key); 
             CookieNodeList<T> typedList = new();
             if (list != null)
-                for (int i = 0; i < list.Length; i++)
+                for (int i = 0; i < list.Count; i++)
                     if (list.Get(i) is T item)
                         typedList.Add(item);
             return typedList;

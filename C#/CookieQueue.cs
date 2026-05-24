@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 /*
     CookieDataStructure
@@ -22,60 +23,47 @@
 namespace smth
 {
     /// <summary>
-    /// This CookieDataStructure requires CookieNode.cs file!
+    /// This CookieDataStructure requires CookieNode.cs and CookieStack.cs files!
     /// Queue created and better-ed by Cookie :]
     /// </summary>
-    /// <typeparam name="T">Type of the queue</typeparam>
-    public class CookieQueue<T>
+    /// <typeparam name="QueueType">Type of the queue</typeparam>
+    public class CookieQueue<QueueType> : IEnumerable<QueueType>
     {
-        private CookieNode<T>? nodes;
-        private CookieNode<T>? pointer_to_end;
+        private CookieNode<QueueType>? head_node;
+        private CookieNode<QueueType>? last_node;
 
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieQueue() { this.nodes = null; this.pointer_to_end = null; }
+        public CookieQueue() { this.head_node = null; this.last_node = null; }
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieQueue(T value) 
-        { this.nodes = new CookieNode<T>(value); this.pointer_to_end = this.nodes; }
-
+        public CookieQueue(QueueType value) 
+        { this.head_node = new CookieNode<QueueType>(value); this.last_node = this.head_node; }
 
         /// <summary>
-        /// Class constructor  -- not bagrut supported!
+        /// Class constructor
         /// </summary>
-        public CookieQueue(CookieNodeList<T> list) 
+        public CookieQueue(CookieNode<QueueType> nodes) 
         { 
-            this.nodes = CookieNodeWorker.NodeListToNodes(list);
-            this.pointer_to_end = this.nodes;
-            while (this.pointer_to_end.Next != null)
-                this.pointer_to_end = this.pointer_to_end.Next; // got to the last
-        } // __init__
-
-
-        /// <summary>
-        /// Class constructor
-        /// </summary>
-        public CookieQueue(CookieNode<T> nodes) 
-        { 
-            this.nodes = nodes;
-            this.pointer_to_end = this.nodes;
-            while (this.pointer_to_end.Next != null)
-                this.pointer_to_end = this.pointer_to_end.Next; // got to the last
+            this.head_node = nodes;
+            this.last_node = this.head_node;
+            while (this.last_node.Next != null)
+                this.last_node = this.last_node.Next; // got to the last
         } // __init__
 
         /// <summary>
         /// Class constructor
         /// </summary>
-        public CookieQueue(T[] list) 
+        public CookieQueue(QueueType[] list) 
         { 
-            this.nodes = CookieNodeWorker.ArrayToNodes(list);
-            this.pointer_to_end = this.nodes;
-            while (this.pointer_to_end.Next != null)
-                this.pointer_to_end = this.pointer_to_end.Next; // got to the last
+            this.head_node = CookieNodeWorker.ArrayToNodes(list);
+            this.last_node = this.head_node;
+            while (this.last_node.Next != null)
+                this.last_node = this.last_node.Next; // got to the last
         } // __init__
 
 
@@ -84,12 +72,12 @@ namespace smth
         /// </summary>
         /// <returns>true is the queue is empty</returns>
         public bool IsEmpty() 
-        { return this.nodes == null && this.pointer_to_end == null; }
+        { return this.head_node == null && this.last_node == null; }
 
         /// <summary>
-        /// Returns queue's length  -- not bagrut supported!
+        /// Returns queue's length 
         /// </summary>
-        public int Length { get { return CookieNodeWorker.RecursionCount<T>(this.nodes); } }
+        public int Length { get { return CookieNodeWorker.RecursionCount<QueueType>(this.head_node); } }
 
 
         // Getters-Setters
@@ -97,16 +85,16 @@ namespace smth
         /// FIFO (FIRST IN ; FIRST OUT) - puts the value at the end
         /// </summary>
         /// <param name="value">Value to save</param>
-        public void Insert(T value)
+        public void Insert(QueueType value)
         { 
-            if (this.nodes == null) // queue is empty
+            if (this.head_node == null) // queue is empty
             {
-                this.nodes = new CookieNode<T>(value);
-                this.pointer_to_end = this.nodes;
+                this.head_node = new CookieNode<QueueType>(value);
+                this.last_node = this.head_node;
                 return;
             } // if 
-            this.pointer_to_end.SetNext(new CookieNode<T>(value));
-            this.pointer_to_end = this.pointer_to_end.Next;
+            this.last_node.SetNext(new CookieNode<QueueType>(value));
+            this.last_node = this.last_node.Next;
         } // Insert
 
 
@@ -114,45 +102,45 @@ namespace smth
         /// FIFO (FIRST IN ; FIRST OUT) - gets the front value ; could be null
         /// </summary>
         /// <returns>The top (first added) value</returns>
-        public T? RemoveValue()
+        public QueueType? RemoveValue()
         {
-            if (this.nodes == null)
-                return default;  // cause.... Just cause >:]
+            if (this.head_node == null)
+                throw new Exception("No values to remove");
 
-            CookieNode<T> node = this.nodes;
+            CookieNode<QueueType> node = this.head_node;
             if (node.GetNext() == null)
-                this.pointer_to_end = null;
-            this.nodes = node.GetNext();
+                this.last_node = null;
+            this.head_node = node.GetNext();
             node.Next = null;
             return node.Value;
         } // Remove
 
         /// <summary>
-        /// Easier way of Remove function :]  -- not bagrut supported!
+        /// FIFO (FIRST IN ; FIRST OUT) - gets the front value ; could be null
         /// </summary>
-        public T? Remove { get { return this.RemoveValue(); } }
+        public QueueType? Remove { get { return this.RemoveValue(); } }
 
 
         /// <summary>
         /// Gets the top value, if the stack is empty, returns default of the type
         /// </summary>
         /// <returns>value of the top</returns>
-        public T? GetTop()
-        { return this.nodes != null ? this.nodes.Value : default; } // if (this.nodes != null) return this.nodes.Value; return default; 
+        public QueueType? GetTop()
+        { return this.head_node != null ? this.head_node.Value : throw new Exception("No values to pop"); } 
 
 
         /// <summary>
-        /// Creates a copy of the object in type of the Nodes  -- not bagrut supported!
+        /// Creates a copy of the object
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieQueue<T>? Copy()
+        public CookieQueue<QueueType>? Copy()
         {
-            if (this.nodes == null)
+            if (this.head_node == null)
                 return null;
 
-            CookieNode<T> return_value = new CookieNode<T>(this.nodes.Value);
-            CookieNode<T> current = return_value;
-            CookieNode<T>? nodes = this.nodes.Next;
+            CookieNode<QueueType> return_value = new CookieNode<QueueType>(this.head_node.Value);
+            CookieNode<QueueType> current = return_value;
+            CookieNode<QueueType>? nodes = this.head_node.Next;
 
             while (nodes != null)
             {
@@ -161,7 +149,7 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
-            return new CookieQueue(return_value);
+            return new(return_value);
         } // Copy
 
 
@@ -169,29 +157,29 @@ namespace smth
         /// Clears the Queue
         /// </summary>
         public void Clear()
-        { this.nodes = null; this.pointer_to_end = null; }
+        { this.head_node = null; this.last_node = null; }
 
 
 
         /// <summary>
-        /// Creates a copy of the object in type of the CookieQueue  -- not bagrut supported!
+        /// Creates a copy of the object in type of the CookieQueue
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieQueue<T>? Reverse()
+        public CookieQueue<QueueType>? Reverse()
         {
-            if (this.nodes == null) return null;
-            if (this.nodes.Count <= 1) return this.Copy();
+            if (this.head_node == null) return null;
+            if (this.Length <= 1) return this.Copy();
 
-            CookieStack<T> rev_stack = new CookieStack<T>();
-            CookieNode<T>? current = this.nodes.Next;
+            CookieStack<QueueType> rev_stack = new CookieStack<QueueType>();
+            CookieNode<QueueType>? current = this.head_node;
 
-            while (nodes != null)
+            while (current != null)
             {
-                rev_stack.Push(current);
+                rev_stack.Push(current.Value);
                 current = current.Next;
             } // while
 
-            CookieQueue<T> rev = new CookieQueue<T>();
+            CookieQueue<QueueType> rev = new CookieQueue<QueueType>();
             while (!rev_stack.IsEmpty())
                 rev.Insert(rev_stack.Pop);
             return rev;
@@ -199,7 +187,41 @@ namespace smth
 
 
 
+        /// <summary>
+        /// Moves front to back once
+        /// </summary>
+        public void RotateLeft()
+        { if (!this.IsEmpty()) this.Insert(this.Remove); }
+
+        /// <summary>
+        /// Moves back to front once
+        /// </summary>
+        public void RotateRight()
+        {
+            if (this.IsEmpty() || this.head_node == this.last_node)  // there is one value in
+                return;
+
+            CookieNode<QueueType> current = this.head_node;
+            while (current.Next != this.last_node)
+                current = current.Next;
+            current.SetNext(null);
+
+            this.last_node.SetNext(this.head_node);
+            this.head_node = this.last_node;
+            this.last_node = current;
+        } // RotateRight
+
+
+
         // override
+
+        // IEnumerable
+        public IEnumerator<QueueType> GetEnumerator()
+        { return head_node.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        // object
+
         /// <summary>
         /// override for ToString to - ['value', 'value', 'value', ...]
         /// </summary>
@@ -213,11 +235,11 @@ namespace smth
         /// <returns>string of the class</returns>
         public string ToString(string split)
         {
-            if (this.nodes == null)
+            if (this.head_node == null)
                 return "[]";
 
             string str = "[";
-            CookieNode<T>? node = this.nodes;
+            CookieNode<QueueType>? node = this.head_node;
 
             while (node != null)
             {

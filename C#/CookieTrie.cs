@@ -26,7 +26,7 @@ namespace smth
     /// This CookieDataStructure requires CookieNode.cs file!
     /// Tuple created and better-ed by Cookie :]
     /// </summary>
-    public class CookieTrie : IEnumerable<char>
+    public class CookieTrie// : IEnumerable<char>
     {
         private CookieNode<char> head_node;
 

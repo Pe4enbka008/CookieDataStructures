@@ -249,10 +249,9 @@ namespace smth
         public CookieTree() : this(null)
         { }
 
-        /// <summary>
-        /// Is the list ReadOnly
-        /// </summary>
-        public bool IsReadOnly { get; }
+
+        public bool IsEmpty()
+        { return this.root == null; }
 
 
         // insert:

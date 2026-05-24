@@ -35,10 +35,6 @@ namespace smth
         private T? value;
         private CookieNode<T>? next;
 
-        /// <summary>
-        /// Is the list ReadOnly
-        /// </summary>
-        public bool IsReadOnly { get; }
 
         /// <summary>
         /// Class setter
@@ -49,9 +45,9 @@ namespace smth
         /// </summary>
         public CookieNode(T value) { this.value = value; this.next = null; }
         /// <summary>
-        /// Class setter with valuable  -- not bagrut supported!
+        /// Class setter with valuable
         /// </summary>
-        public CookieNode(CookieNode<T>? node) { this.value = node.GetValue(); this.next = null; }
+        public CookieNode(CookieNode<T> node) { this.value = node.GetValue(); this.next = null; }
         /// <summary>
         /// Class setter with valuable
         /// </summary>
@@ -60,10 +56,10 @@ namespace smth
 
         // Value:
         /// <summary>
-        /// Return value of the node  -- not bagrut supported!
+        /// Return value of the node 
         /// </summary>
         /// <returns>The value</returns>
-        public T Value { get { return this.value; } }
+        public T Value { get { return GetValue(); } }
 
         /// <summary>
         /// The function gets the mode value
@@ -74,34 +70,26 @@ namespace smth
 
 
         /// <summary>
-        /// The function sets value if it's valid
+        /// The function sets value 
         /// </summary>
         /// <param name="new_value">New value to set</param>
         public void SetValue(T new_value)
-        { if (this.Valid(new_value)) this.value = new_value; }
-
-        /// <summary>
-        /// The function check if the given value is valid  -- not bagrut supported!
-        /// </summary>
-        /// <param name="value">New value to set</param>
-        /// <returns>True if values given is valid</returns>
-        private bool Valid(T value)
-        { return true; }
+        { this.value = new_value; }
 
 
 
         // Next:
         /// <summary>
-        /// Returns next node, also can set the next node  -- not bagrut supported!
+        /// Returns next node, also can set the next node 
         /// </summary>
         /// <returns>The value</returns>
-        public CookieNode<T>? Next { get { return this.next; } set { if (value is CookieNode<T> || value == null) this.next = value; } }
+        public CookieNode<T>? Next { get { return GetNext(); } set { SetNext(value); } }
 
         /// <summary>
         /// The function returns next node
         /// </summary>
         /// <returns>Next node saved</returns>
-        public CookieNode<T> GetNext()
+        public CookieNode<T>? GetNext()
         { return this.next; }
 
 
@@ -109,7 +97,7 @@ namespace smth
         /// The function saves next node
         /// </summary>
         /// <param name="new_value">The next node</param>
-        public void SetNext(CookieNode<T> new_value)
+        public void SetNext(CookieNode<T>? new_value)
         { this.next = new_value; }
 
 
@@ -154,7 +142,7 @@ namespace smth
         public static CookieNode<T> ArrayToNodes<T>(T[]? list)
         {
             if (list == null || list.Length == 0)
-                return new CookieNode<T>();
+                return null;
             CookieNode<T> nodes = null, current = null;
             foreach (T elem in list)
             {
@@ -182,7 +170,7 @@ namespace smth
         public static CookieNode<string> CreateStringList(int length)
         {
             // Downlaod .dic and .aff; in console "dotnet add package NHunspell"
-            CookieNode<string> list = new CookieNode<string>();
+            CookieNode<string> list = new CookieNode<string>("Cookie");
             using (Hunspell hunspell = new Hunspell("en_US.aff", "en_US.dic"))
             {
                 Random rnd = new Random();
@@ -199,7 +187,7 @@ namespace smth
                     if (suggestions.Count > 0)  // choose one suggestion
                     {
                         string suggestion = suggestions[rnd.Next(suggestions.Count)];
-                        if (!list.Contains(suggestion) && hunspell.Spell(suggestion) && suggestion.Length > 3 && Char.IsAsciiLetterLower(suggestion[0])) // no repeats
+                        if (!ContainsElement<string>(list, suggestion) && hunspell.Spell(suggestion) && suggestion.Length > 3 && Char.IsAsciiLetterLower(suggestion[0])) // no repeats
                         {
                             Add<string>(list, suggestion);
                             length--;
@@ -207,7 +195,7 @@ namespace smth
                     } // if
                 } // while
             } // using
-            return list;
+            return list.Next;
         } // CreateList - string
 
         /// <summary>
@@ -245,9 +233,9 @@ namespace smth
         public static CookieNode<T> CreateList<T>(int length, bool repeat = true)
         {
             if ((typeof(T) != typeof(int) && typeof(T) != typeof(float) && typeof(T) != typeof(double)) || length == 0)
-                return new CookieNode<T>();
+                return null;
 
-            CookieNode<T> list = new CookieNode<T>();
+            CookieNode<T> list = new CookieNode<T>((T)(object)-1);
             Random rnd = new Random();
             while (length > 0)
             {
@@ -257,7 +245,7 @@ namespace smth
                 Add<T>(list, number);
                 length--;
             } // while
-            return list;
+            return list.Next;
         } // CreateList - int; double; float
 
         /// <summary>
@@ -271,7 +259,7 @@ namespace smth
             if (length > 26 * 2)
                 repeat = true;
 
-            CookieNode<char> list = new CookieNode<char>();
+            CookieNode<char> list = new CookieNode<char>('C');
             Random rnd = new Random();
             while (length > 0)
             {
@@ -284,7 +272,7 @@ namespace smth
                 Add<char>(list, letter);
                 length--;
             } // while
-            return list;
+            return list.Next;
         } // CreateList - char
 
         /// <summary>
@@ -294,14 +282,14 @@ namespace smth
         /// <returns>the made list</returns>
         public static CookieNode<bool> CreateList(int length)
         {
-            CookieNode<bool> list = new CookieNode<bool>();
+            CookieNode<bool> list = new CookieNode<bool>(true);
             Random rnd = new Random();
             while (length > 0)
             {
                 Add<bool>(list, rnd.Next(26) % 2 == 0);
                 length--;
             } // while
-            return list;
+            return list.Next;
         } // CreateList - bool
 
 
@@ -340,14 +328,14 @@ namespace smth
         /// </summary>
         /// <typeparam name="T">Type of the list and element</typeparam>
         /// <param name="nodes">Node list</param>
-        /// <param name="item">Element/Item to look for</param>
+        /// <param name="value">Element/Item to look for</param>
         /// <returns>True if the element is in the node list</returns>
-        public static bool ContainsElement<T>(CookieNode<T>? nodes, T item)
+        public static bool ContainsElement<T>(CookieNode<T>? nodes, T value)
         {
             CookieNode<T> some_node = nodes;
             while (some_node != null)
             {
-                if (some_node.GetValue().Equals(item))
+                if (Equals(nodes.Value, value))
                     return true;
                 some_node = some_node.GetNext();
             } // while
@@ -397,15 +385,15 @@ namespace smth
         /// </summary>
         /// <typeparam name="T">Type of the list and element</typeparam>
         /// <param name="nodes">Node list</param>
-        /// <param name="item">Element/Item to look for</param>
+        /// <param name="value">Element/Item to look for</param>
         /// <returns>Number of the elements found</returns>
-        public static int RecursionCountElement<T>(CookieNode<T>? nodes, T item)
+        public static int RecursionCountElement<T>(CookieNode<T>? nodes, T value)
         {
             if (nodes == null) return 0;
             int same = 0;
-            if (nodes.GetValue().Equals(item))
+            if (Equals(nodes.Value, value))
                 same = 1;
-            return same + RecursionCountElement(nodes.GetNext(), item);
+            return same + RecursionCountElement(nodes.GetNext(), value);
         } // RecursionCountElement
         
 
@@ -414,15 +402,15 @@ namespace smth
         /// Removes item from the list
         /// </summary>
         /// <param name="nodes">Nodes to add to</param>
-        /// <param name="item">Item to add</param>
-        public static CookieNode<T>? Remove<T>(CookieNode<T>? nodes, T item)
+        /// <param name="value">Item to add</param>
+        public static CookieNode<T>? Remove<T>(CookieNode<T>? nodes, T value)
         {
             int length = RecursionCount(nodes);
             if (nodes == null)
                 return nodes;
 
             // item is head
-            if (nodes.GetValue().Equals(item))
+            if (Equals(nodes.Value, value))
             {
                 nodes = nodes.GetNext();
                 return nodes;
@@ -431,7 +419,7 @@ namespace smth
             CookieNode<T> some_node = nodes;
             while (some_node.GetNext() != null)
             {
-                if (some_node.GetNext().GetValue().Equals(item))
+                if (Equals(some_node.Next.Value, value))
                 {
                     some_node.SetNext(some_node.GetNext().GetNext());
                     return nodes;
