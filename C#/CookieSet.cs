@@ -31,17 +31,17 @@ namespace smth
     {
         private CookieDict<SetType, bool> values;
         public CookieSet()
-        {
-            values = new CookieDict<SetType, bool>();
-        } // __init__
-
-
-        public bool IsEmpty()
-        {  return values.IsEmpty(); }
-
+        { values = new CookieDict<SetType, bool>(); } 
 
 
         // Getters:
+
+        /// <summary>
+        /// Returns if the set is empty
+        /// </summary>
+        /// <returns>true is empty, otherwise false</returns>
+        public bool IsEmpty()
+        {  return values.IsEmpty(); }
 
         /// <summary>
         /// Get element at index
