@@ -244,7 +244,7 @@ namespace smth
 
 
     /// <summary>
-    /// This CookieDataStructure requires CookieNode.cs file!
+    /// This CookieDataStructure doesn't require any extra file!
     /// Binary Tree created and better-ed by Cookie :]
     /// </summary>
     /// <typeparam name="TreeType">Type of the binary tree</typeparam>6
