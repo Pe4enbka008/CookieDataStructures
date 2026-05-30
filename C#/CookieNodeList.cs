@@ -159,7 +159,8 @@ namespace smth
 
 
 
-        // Getters
+        // Getters:
+        
         /// <summary>
         /// Get element at index
         /// </summary>
@@ -192,6 +193,7 @@ namespace smth
             } // while
             return -1;
         } // GetIndex
+        
         /// <summary>
         /// Finds index of the item inputted. If the item is not found, returns -1
         /// </summary>
@@ -229,6 +231,7 @@ namespace smth
 
 
         // Special case : contains value
+        
         /// <summary>
         /// Checks if the list has an item specified
         /// </summary>
@@ -238,6 +241,7 @@ namespace smth
         { if (this.head_node == null) return false; return this.GetIndex(item) != -1; }
 
         // Special case : copy value
+        
         /// <summary>
         /// The function return a copy of this object
         /// </summary>
@@ -245,8 +249,22 @@ namespace smth
         public CookieNodeList<ListType> Copy()
         { return new CookieNodeList<ListType>(this); }
 
+        // ICollection
+
+        /// <summary>
+        /// Copies elements ot array given (for ICollection)
+        /// </summary>
+        /// <param name="array">Array to copy to</param>
+        /// <param name="arrayIndex">Copy from</param>
+        public void CopyTo(ListType[] array, int arrayIndex)
+        {
+            foreach (var item in this)
+                array[arrayIndex++] = item;
+        } // CopyTo
+
 
         // Special case : change type
+        
         /// <summary>
         /// Changes the type of the list to the requested - be sure it's convertable!
         /// </summary>
@@ -305,6 +323,7 @@ namespace smth
 
 
         // Setters
+        
         /// <summary>
         /// Adds an item to the end of the list
         /// </summary>
@@ -421,6 +440,7 @@ namespace smth
 
 
         // Removes:
+        
         /// <summary>
         /// Removes the first instance of the item specified
         /// </summary>
@@ -564,21 +584,6 @@ namespace smth
 
             return str + "]";
         } // override ToString
-
-
-        // ICollection
-
-        /// <summary>
-        /// Copies elements ot array given
-        /// </summary>
-        /// <param name="array">Array to copy to</param>
-        /// <param name="arrayIndex">Copy from</param>
-        public void CopyTo(ListType[] array, int arrayIndex)
-        {
-            foreach (var item in this)
-                array[arrayIndex++] = item;
-        } // CopyTo
-
 
 
 
