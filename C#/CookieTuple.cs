@@ -53,24 +53,6 @@ namespace smth
         /// <summary>
         /// Class setter with valuables
         /// </summary>
-        private CookieTuple(CookieNodeList<TupleType> nodes)
-        {
-            CookieNode<TupleType> prev_node = null;
-
-            foreach (TupleType value in nodes)
-            {
-                CookieNode<TupleType> some_node = new(value);
-
-                if (this.head_node == null)
-                    this.head_node = some_node;
-                else
-                    prev_node.SetNext(some_node);
-                prev_node = some_node;
-            } // foreach
-        } // __init__
-        /// <summary>
-        /// Class setter with valuables
-        /// </summary>
         private CookieTuple(CookieTuple<TupleType> nodes)
         {
             CookieNode<TupleType> prev_node = null;
@@ -235,10 +217,11 @@ namespace smth
         /// </summary>
         /// <typeparam name="RequestedType">Type to change to</typeparam>
         /// <returns>If possible, the list, if not null list</returns>
-        public CookieNodeList<RequestedType>? ChangeType<RequestedType>()
+        public CookieTuple<RequestedType>? ChangeType<RequestedType>()
         {
             if (this.head_node == null) return null;
-            CookieNodeList<RequestedType> new_list = new CookieNodeList<RequestedType>();
+            RequestedType[] new_list = new RequestedType[this.Length];
+            int count = 0;
 
             CookieNode<TupleType>? nodes = this.head_node;
             while (nodes != null)
@@ -246,7 +229,7 @@ namespace smth
                 try
                 {
                     RequestedType value = (RequestedType)Convert.ChangeType(nodes.Value, typeof(RequestedType));
-                    new_list.Append(value);
+                    new_list[count++] = value;
                 } // try
                 catch
                 { return null; } // conversion failed - break
@@ -254,7 +237,7 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
-            return new_list;
+            return new(new_list);
         } // ChangeType
 
         /// <summary>
@@ -265,7 +248,7 @@ namespace smth
         public CookieNodeList<RequestedType>? PartlyChangeType<RequestedType>()
         {
             if (this.head_node == null) return null;
-            CookieNodeList<RequestedType> new_list = new CookieNodeList<RequestedType>();
+            RequestedType[] new_list = new RequestedType[this.Length];
 
             CookieNode<TupleType>? nodes = this.head_node;
             while (nodes != null)
@@ -273,7 +256,7 @@ namespace smth
                 try
                 {
                     RequestedType value = (RequestedType)Convert.ChangeType(nodes.Value, typeof(RequestedType));
-                    new_list.Append(value);
+                    new_list[count++] = value;
                 } // try
                 catch
                 { } // conversion failed - do nothing
@@ -281,21 +264,29 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
-            return new_list;
+            return new(new_list);
         } // PartlyChangeType
 
 
-        // Object
+        // override
+
+         // IEnumerable
+        public IEnumerator<TupleType> GetEnumerator() 
+        { return head_node.GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        
+
+        // object
 
         /// <summary>
-        /// override for ToString to - ['value', 'value', 'value', ...]
+        /// override for ToString to - ('value', 'value', 'value', ...)
         /// </summary>
         /// <returns>string of the class</returns>
         public override string ToString()
         { return ToString(", "); }
 
         /// <summary>
-        /// override for ToString to - ['value'{split} 'value'{split} 'value'{split} ...]
+        /// override for ToString to - ('value'{split}'value'{split}'value'{split} ...)
         /// </summary>
         /// <returns>string of the class</returns>
         public string ToString(string split)
@@ -316,26 +307,7 @@ namespace smth
 
             return str + ")";
         } // override ToString
-
-
-        // IEnumerable
-        public IEnumerator<TupleType> GetEnumerator() 
-        { return head_node.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-
-        // ICollection
-
-        /// <summary>
-        /// Copies elements to array given
-        /// </summary>
-        /// <param name="array">Array to copy to</param>
-        /// <param name="arrayIndex">Copy from</param>
-        public void CopyTo(TupleType[] array, int arrayIndex)
-        {
-            foreach (var item in this)
-                array[arrayIndex++] = item;
-        } // CopyTo
+        
 
 
     } // CookieTuple
