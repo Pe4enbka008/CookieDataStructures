@@ -185,8 +185,9 @@ namespace smth
 
         // IEnumerable
         public IEnumerator<StackType> GetEnumerator()
-        { return this.head_node.GetEnumerator(); }
+        { if (this.head_node != null) return this.head_node.GetEnumerator(); return Enumerable.Empty<StackType>().GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
 
         // object 
 
@@ -200,7 +201,7 @@ namespace smth
         } // override ToString
 
         /// <summary>
-        /// override for ToString to - ['value'{split} 'value'{split} 'value'{split} ...]
+        /// override for ToString to - ['value'{split}'value'{split}'value'{split} ...]
         /// </summary>
         /// <returns>string of the class</returns>
         public string ToString(string split)

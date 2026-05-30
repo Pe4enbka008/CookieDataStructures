@@ -26,13 +26,13 @@ namespace smth
     /// <summary>
     /// Node for many things!
     /// </summary>
-    /// <typeparam name="T">Type of the node list</typeparam>
+    /// <typeparam name="T">Type of the node</typeparam>
     public class CookieNode<T> : IEnumerable<T>
     {
         /// <summary>
         /// Node value
         /// </summary>
-        private T? value;
+        private T value;
         private CookieNode<T>? next;
 
 
@@ -62,7 +62,7 @@ namespace smth
         public T Value { get { return GetValue(); } }
 
         /// <summary>
-        /// The function gets the mode value
+        /// The function gets the node value
         /// </summary>
         /// <returns>The value</returns>
         public T GetValue()
@@ -100,17 +100,16 @@ namespace smth
         public void SetNext(CookieNode<T>? new_value)
         { this.next = new_value; }
 
+        /// <summary>
+        /// The function saves next node
+        /// </summary>
+        /// <param name="new_value">The next node</param>
+        public void SetNext(T new_value)
+        { this.next = new(new_value); }
+       
+
 
         // override:
-        /// <summary>
-        /// Returns string of the value saved here
-        /// </summary>
-        /// <returns>Value as a string</returns>
-        public override string ToString()
-        { return $"{this.value}"; }
-
-
-
         // IEnumerable
         public IEnumerator<T> GetEnumerator() // foreach!
         {
@@ -123,12 +122,29 @@ namespace smth
         } // GetEnumerator
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+
+        // object:
+        /// <summary>
+        /// Returns string of the value saved here
+        /// </summary>
+        /// <returns>Value as a string</returns>
+        public override string ToString()
+        { return $"{this.value}"; }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is CookieNode<T>) return this.Value.Equals(((CookieNode<T>)obj).Value);
+            if (obj is T) return this.Value.Equals((T)obj);
+            return false;
+        } // override Equals
+
+
     } // class CookieNode
 
 
     /// <summary>
     /// Helping class that manipulates with nodes
-    /// can be deleted / cut to not require NHunspell: 'creators'
+    /// The class requires NHunspell; If you don't want to download it, delete 'creators'
     /// </summary>
     public class CookieNodeWorker
     {
@@ -335,7 +351,7 @@ namespace smth
             CookieNode<T> some_node = nodes;
             while (some_node != null)
             {
-                if (Equals(nodes.Value, value))
+                if (nodes.Equals(value))
                     return true;
                 some_node = some_node.GetNext();
             } // while
@@ -391,7 +407,7 @@ namespace smth
         {
             if (nodes == null) return 0;
             int same = 0;
-            if (Equals(nodes.Value, value))
+            if (nodes.Equals(value))
                 same = 1;
             return same + RecursionCountElement(nodes.GetNext(), value);
         } // RecursionCountElement
@@ -410,7 +426,7 @@ namespace smth
                 return nodes;
 
             // item is head
-            if (Equals(nodes.Value, value))
+            if (nodes.Equals(value))
             {
                 nodes = nodes.GetNext();
                 return nodes;
@@ -419,7 +435,7 @@ namespace smth
             CookieNode<T> some_node = nodes;
             while (some_node.GetNext() != null)
             {
-                if (Equals(some_node.Next.Value, value))
+                if (some_node.Next.Equals(value))
                 {
                     some_node.SetNext(some_node.GetNext().GetNext());
                     return nodes;

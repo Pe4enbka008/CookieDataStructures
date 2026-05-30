@@ -49,6 +49,7 @@ namespace smth
         /// </summary>
         public CookieNodeList(ListType[] arr)
         {
+            this.head_node = null;
             CookieNode<ListType> prev_node = null;
 
             foreach (ListType value in arr)
@@ -65,13 +66,34 @@ namespace smth
         /// <summary>
         /// Class setter with valuables
         /// </summary>
-        private CookieNodeList(CookieNodeList<ListType> nodes)
+        public CookieNodeList(CookieNode<ListType> nodes)
         {
+            this.head_node = null;
             CookieNode<ListType> prev_node = null;
 
-            for (int i = 0; i < nodes.Count; i++)
+            while (nodes != null)
             {
-                CookieNode<ListType> some_node = new(nodes.Get(i));
+                CookieNode<ListType> some_node = new(nodes.Value);
+
+                if (this.head_node == null)
+                    this.head_node = some_node;
+                else
+                    prev_node.SetNext(some_node);
+                prev_node = some_node;
+                nodes = nodes.Next;
+            } // while
+        } // __init__
+        /// <summary>
+        /// Class setter with valuables
+        /// </summary>
+        private CookieNodeList(CookieNodeList<ListType> nodes)
+        {
+            this.head_node = null;
+            CookieNode<ListType> prev_node = null;
+
+            foreach (ListType value in nodes)
+            {
+                CookieNode<ListType> some_node = new(value);
 
                 if (this.head_node == null)
                     this.head_node = some_node;
@@ -131,7 +153,7 @@ namespace smth
         {
             int dupe = 0;
             if (node == null) return dupe;
-            if (item.Equals(node.Value)) dupe++;
+            if (node.Equals(item)) dupe++;
             return dupe + CountElementDuplicatesLoop(item, node.GetNext());
         } // CountElementDuplicatesLoop
 
@@ -163,7 +185,7 @@ namespace smth
 
             while (some_node != null)
             {
-                if (some_node.Value.Equals(item))
+                if (some_node.Equals(item))
                     return counter;
                 counter++;
                 some_node = some_node.GetNext();
@@ -410,7 +432,7 @@ namespace smth
                 return false;
 
             // item is head
-            if (this.head_node.Value.Equals(item))
+            if (this.head_node.Equals(item))
             {
                 this.head_node = this.head_node.GetNext();
                 return false;
@@ -419,7 +441,7 @@ namespace smth
             CookieNode<ListType> some_node = this.head_node;
             while (some_node.GetNext() != null)
             {
-                if (some_node.GetNext().Value.Equals(item))
+                if (some_node.GetNext().Equals(item))
                 {
                     some_node.SetNext(some_node.GetNext().GetNext());
                     return true;
@@ -499,13 +521,19 @@ namespace smth
         /// Wipes the list clean
         /// </summary>
         public void Clear()
-        { this.head_node = null; } 
+        { this.head_node = null; }
 
 
 
         // override
 
-        // Object
+        // IEnumerable
+        public IEnumerator<ListType> GetEnumerator()
+        { if (head_node != null) return head_node.GetEnumerator(); return Enumerable.Empty<ListType>().GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+
+        // object
 
         /// <summary>
         /// override for ToString to - ['value', 'value', 'value', ...]
@@ -515,7 +543,7 @@ namespace smth
         { return ToString(", "); }
 
         /// <summary>
-        /// override for ToString to - ['value'{split} 'value'{split} 'value'{split} ...]
+        /// override for ToString to - ['value'{split}'value'{split}'value'{split} ...]
         /// </summary>
         /// <returns>string of the class</returns>
         public string ToString(string split)
@@ -536,12 +564,6 @@ namespace smth
 
             return str + "]";
         } // override ToString
-
-
-        // IEnumerable
-        public IEnumerator<ListType> GetEnumerator() 
-        { return head_node.GetEnumerator(); } 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
         // ICollection

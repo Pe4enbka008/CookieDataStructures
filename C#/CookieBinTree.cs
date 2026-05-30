@@ -1,5 +1,5 @@
-﻿using smth;
-using System;
+﻿using System;
+using System.Collections;
 
 /*
     CookieDataStructure
@@ -90,6 +90,10 @@ namespace smth
     } // CookieBinNode
 
 
+
+    /// <summary>
+    /// Static class for dealing with double-linked list
+    /// </summary>
     public class CookieHoldingLineHelper
     {
         // prints:
@@ -239,6 +243,11 @@ namespace smth
 
 
 
+    /// <summary>
+    /// This CookieDataStructure requires CookieNode.cs file!
+    /// Binary Tree created and better-ed by Cookie :]
+    /// </summary>
+    /// <typeparam name="TreeType">Type of the binary tree</typeparam>6
     public class CookieTree<TreeType> : IEnumerable<TreeType>
     {
         private CookieBinNode<TreeType>? root;
@@ -430,14 +439,9 @@ namespace smth
 
 
         // IEnumerable
-        public System.Collections.Generic.IEnumerator<TreeType> GetEnumerator()
-        { return InOrderYeald(root).GetEnumerator(); }
-
-        System.Collections.IEnumerator
-        System.Collections.IEnumerable.GetEnumerator()
-        { return GetEnumerator(); }
-
-        private IEnumerable<TreeType> InOrderYeald(CookieBinNode<TreeType>? node)
+        public IEnumerator<TreeType> GetEnumerator()
+        { if (root != null) return InOrderYeald(root); return Enumerable.Empty<TreeType>().GetEnumerator(); }
+        private IEnumerable<TreeType> InOrderYield(CookieBinNode<TreeType>? node)
         {
             if (node == null)
                 yield break;
@@ -449,7 +453,8 @@ namespace smth
 
             foreach (var v in InOrderYeald(node.Right))
                 yield return v;
-        } // InOrderYeald
+        } // InOrderYield
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
 

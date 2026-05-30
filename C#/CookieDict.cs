@@ -236,14 +236,14 @@ namespace smth
         /// <summary>
         /// Override of the ToString
         /// </summary>
-        /// <returns>The dist as { key: [], ... }</returns>
+        /// <returns>The dict as { 'key': ['value', 'value', 'value', ... ], 'key': [...], ... }</returns>
         public override string ToString()
         { return ToString(", "); } 
 
         /// <summary>
-        /// override for ToString to - { key: ['value', 'value', 'value', ... ]{split}key: [...] ...}
+        /// override for ToString to - { 'key': ['value', 'value', 'value', ... ]{split}'key': [...] ...}
         /// </summary>
-        /// <returns>string of the class</returns>
+        /// <returns>string of the dict</returns>
         public string ToString(string split)
         {
             string str = "{";
@@ -258,6 +258,7 @@ namespace smth
         } // override ToString
 
     } // class CookieDict
+
 
 
     public class CookieHash : CookieDict<object, object?> // key: obj and value: obj or null

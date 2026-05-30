@@ -24,9 +24,9 @@ namespace smth
 {
     /// <summary>
     /// This CookieDataStructure requires CookieNode.cs file!
-    /// Tuple created and better-ed by Cookie :]
+    /// Ring Buffer created by Cookie 
     /// </summary>
-    /// <typeparam name="RingType">CookieRingBuffer type</typeparam>
+    /// <typeparam name="RingType">Type of the ring buffer</typeparam>
     public class CookieRingBuffer<RingType> : IEnumerable<RingType>
     {
         private CookieNode<RingType> head_node;   // oldest
@@ -234,10 +234,10 @@ namespace smth
 
         // override:
 
-
         // IEnumerable
         public IEnumerator<RingType> GetEnumerator() // foreach!
         {
+            if (this.IsEmpty()) return Enumerable.Empty<RingType>().GetEnumerator();
             CookieNode<RingType>? current = this.head_node;
             for (int i = 0; i < this.count; i++)
             {

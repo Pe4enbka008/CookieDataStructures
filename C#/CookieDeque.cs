@@ -24,9 +24,9 @@ namespace smth
 {
     /// <summary>
     /// This CookieDataStructure requires CookieNode.cs file!
-    /// Queue created and better-ed by Cookie :]
+    /// Deque created and better-ed by Cookie :]
     /// </summary>
-    /// <typeparam name="DequeType">Type of the queue</typeparam>6
+    /// <typeparam name="DequeType">Type of the deque</typeparam>6
     public class CookieDeque<DequeType> : IEnumerable<DequeType>
     {
         private CookieNode<DequeType>? head_node;
@@ -224,7 +224,7 @@ namespace smth
         /// Moves back to front once
         /// </summary>
         public void RotateRight()
-        { if (!this.IsEmpty()) this.PushFront(this.PopBack()); } 
+        { if (!this.IsEmpty()) this.PushFront(this.PopBack()); }
 
 
 
@@ -232,7 +232,7 @@ namespace smth
 
         // IEnumerable
         public IEnumerator<DequeType> GetEnumerator()
-        { return this.head_node.GetEnumerator(); }
+        { if (head_node != null) return head_node.GetEnumerator(); return Enumerable.Empty<DequeType>().GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // object 

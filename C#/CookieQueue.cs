@@ -217,7 +217,7 @@ namespace smth
 
         // IEnumerable
         public IEnumerator<QueueType> GetEnumerator()
-        { return head_node.GetEnumerator(); }
+        { if (head_node != null) return head_node.GetEnumerator(); return Enumerable.Empty<QueueType>().GetEnumerator(); }
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // object

@@ -24,9 +24,9 @@ namespace smth
 {
     /// <summary>
     /// This CookieDataStructure requires CookieNode.cs, CookieNodeList.cs and CookieDict.cs files!
-    /// Tuple created and better-ed by Cookie :]
+    /// Set created and better-ed by Cookie :]
     /// </summary>
-    /// <typeparam name="SetType">Type of the node tuple</typeparam>
+    /// <typeparam name="SetType">Type of the node set</typeparam>
     public class CookieSet<SetType> : IEnumerable<SetType>
     {
         private CookieDict<SetType, bool> values;
@@ -205,21 +205,22 @@ namespace smth
         // override
 
         // IEnumerable
+
         public IEnumerator<SetType> GetEnumerator()
-        { return this.values.CookieKeys.GetEnumerator(); }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        { if (this.values.CookieKeys != null) return this.values.CookieKeys.GetEnumerator(); return Enumerable.Empty<QueueType>().GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator () => GetEnumerator();
 
         // object 
 
         /// <summary>
         /// Override of the ToString
         /// </summary>
-        /// <returns>The dist as { key: [], ... }</returns>
+        /// <returns>The set as {'value', 'value', 'value', ...}</returns>
         public override string ToString()
         { return ToString(", "); }
 
         /// <summary>
-        /// override for ToString to - { key: ['value', 'value', 'value', ... ]{split}key: [...] ...}
+        /// override for ToString to - {'value'{split}'value'{split}'value'{split}...}
         /// </summary>
         /// <returns>string of the class</returns>
         public string ToString(string split)
@@ -238,5 +239,5 @@ namespace smth
         } // override ToString
 
 
-    } // CookieTurtle
+    } // CookieSet
 }
