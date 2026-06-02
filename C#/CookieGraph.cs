@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 /*
     CookieDataStructure
@@ -145,7 +147,7 @@ namespace smth
 
 
     /// <summary>
-    /// This CookieDataStructure requires CookieNode.cs, CookieNodeList.cs, CookieTuple.cs and CookieQueue.cs files!
+    /// This CookieDataStructure requires CookieNode.cs, CookieNodeList.cs, CookieTuple.cs, CookieQueue.cs and CookieDict.cs files!
     /// Graph created and better-ed by Cookie :]
     /// </summary>
     /// <typeparam name="GraphType">Type of the node graph</typeparam>
@@ -369,30 +371,74 @@ namespace smth
 
         public CookieNodeList<GraphType> ShortestPath(GraphType from, GraphType to)
         {
-            if (!Contains(from) || !Contains(to)) throw new KeyNotFoundException();
-            throw new NotImplementedException();
+            if (!(Contains(from) && Contains(to)))
+                throw new KeyNotFoundException();
+
+            CookieQueue<CookieGraphNode<GraphType>> queue = new();
+            queue.Insert(GetNode(from));
+
+            CookieNodeList<GraphType> visited = new();
+            visited.Add(from);
+
+            CookieDict<GraphType, GraphType> parent_list = new();
+
+            while (!queue.IsEmpty())
+            {
+                var current_node = queue.Remove;
+                if (current_node.Value.Equals(to)) break;
+
+                foreach (var neighbour in current_node.Neighbours)
+                    if (!visited.Contains(neighbour.Value))
+                    {
+                        visited.Add(neighbour.Value);
+                        parent_list[neighbour.Value] = current_node.Value;
+                        queue.Insert(neighbour);
+                    } // if
+            } // while
+
+            if (!visited.Contains(to)) throw new Exception($"No path from {from} to {to}");
+            CookieNodeList<GraphType> result = new();
+
+            GraphType current_value = to;
+            result.Add(current_value);
+
+            while (!current_value.Equals(from))
+            {
+                current_value = parent_list[current_value];
+                result.Add(current_value);
+            } // while 
+            return result;
         } // ShortestPath
+
 
 
         public bool HasCycle()
         {
-            throw new NotImplementedException();
+            foreach (CookieGraphNode<GraphType> root in this.nodes)
+                if (HasCycle(root, new())) return true;
+            return false;
         } // HasCycle
-        private static bool HasCycle(CookieGraphNode<GraphType> nodes)
+        private static bool HasCycle(CookieGraphNode<GraphType> current, CookieNodeList<GraphType> visited)
         {
-            throw new NotImplementedException();
+            if (current == null) return false;
+            if (visited.Contains(current.Value)) return true;
+            visited.Add(current.Value);
+
+            foreach (var neighbour in current.Neighbours)
+                if (HasCycle(neighbour, visited.Copy()))
+                    return true;
+            return false;
         } // HasCycle
 
 
         public bool IsTree()
         {
-            throw new NotImplementedException();
+            if (HasCycle()) return false;
+            foreach (CookieGraphNode<GraphType> root in this.nodes)
+                if (this.DepthFirstSearch(root.Value).Count == VertexCount()) 
+                    return true;
+            return false;
         } // IsTree
-        private static bool IsTree(CookieGraphNode<GraphType> nodes)
-        {
-            throw new NotImplementedException();
-        } // IsTree
-
 
 
 
