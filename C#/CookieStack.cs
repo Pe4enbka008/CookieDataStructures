@@ -20,6 +20,23 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieStack contains
+    IsEmpty - public function
+    Push - public function
+    PopValue - public function
+    GetTop - public function
+    Copy - public function
+    Clear - public function
+    Reverse - public function
+    RotateLeft - public function
+    RotateRight - public function
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    ToString - public function (2 overloads: no-arg, with split string)
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -30,6 +47,8 @@ namespace smth
     public class CookieStack<StackType> : IEnumerable<StackType>
     {
         private CookieNode<StackType>? head_node;
+
+        private static string className = "CookieStack";
 
         /// <summary>
         /// Class constructor
@@ -77,10 +96,10 @@ namespace smth
         /// LIFO (LAST IN ; FIRST OUT) - gets the front value ; could be null
         /// </summary>
         /// <returns>The top (last added) value</returns>
-        public StackType? PopValue()
+        public StackType PopValue()
         {
             if (this.head_node == null)
-                throw new Exception("No values to pop");
+                throw new CookieEmptyStructureException(className);
 
             CookieNode<StackType> node = this.head_node;
             this.head_node = node.GetNext();
@@ -91,25 +110,25 @@ namespace smth
         /// <summary>
         /// Easier way of Pop function :]
         /// </summary>
-        public StackType? Pop { get { return this.PopValue(); } }
+        public StackType Pop { get { return this.PopValue(); } }
 
 
         /// <summary>
         /// Gets the top value, if the stack is empty, returns default of the type
         /// </summary>
         /// <returns>value of the top</returns>
-        public StackType? GetTop()
-        { return this.head_node != null ? this.head_node.Value : throw new Exception("No values to pop"); } 
+        public StackType GetTop()
+        { return this.head_node != null ? this.head_node.Value : throw new CookieEmptyStructureException(className); } 
 
 
         /// <summary>
         /// Creates a copy of the object
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieStack<StackType>? Copy()
+        public CookieStack<StackType> Copy()
         {
             if (this.head_node == null)
-                return null;
+                throw new CookieEmptyStructureException(className);
 
             CookieNode<StackType> return_value = new CookieNode<StackType>(this.head_node.Value);
             CookieNode<StackType> current = return_value;
@@ -137,9 +156,8 @@ namespace smth
         /// Creates a copy of the object in type of the CookieStack
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieStack<StackType>? Reverse()
+        public CookieStack<StackType> Reverse()
         {
-            if (this.head_node == null) return null;
             if (this.Length <= 1) return this.Copy();
 
             CookieStack<StackType> rev = new CookieStack<StackType>();
@@ -184,8 +202,16 @@ namespace smth
         // override
 
         // IEnumerable
+        /// <summary>
+        /// Returns an enumerator that walks the stack from top to bottom (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator over the stack's values, top first</returns>
         public IEnumerator<StackType> GetEnumerator()
         { if (this.head_node != null) return this.head_node.GetEnumerator(); return Enumerable.Empty<StackType>().GetEnumerator(); }
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over the stack's values, top first</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 

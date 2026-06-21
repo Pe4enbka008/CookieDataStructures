@@ -24,6 +24,45 @@ using System.Runtime.CompilerServices;
 */
 
 
+
+/*
+CookieDataStructure: CookieGraphNode contains
+    GetValue - public function
+    GetNeighbours - public function
+    SetValue - public function
+    SetNewNeighbour - public function
+    RemoveNeighbour - public function
+    ToString - public function
+    Equals - public function
+
+CookieDataStructure: CookieGraph contains
+    Neighbours - public function
+    GetNode - private function
+    GetEdges - public function
+    Contains - public function
+    VertexCount - public function
+    EdgeCount - public function
+    OutDegree - public function
+    InDegree - public function
+    AddVertex - public function
+    AddEdge - public function
+    AddDoubleEdge - public function
+    RemoveVertex - public function
+    RemoveEdge - public function
+    RemoveDoubleEdge - public function
+    Clear - public function
+    DepthFirstSearch - public function (and matching private recursive overload)
+    BreadthFirstSearch - public function
+    GetGraph - public function
+    HasPath - public function (and matching private recursive overload)
+    ShortestPath - public function
+    HasCycle - public function (and matching private recursive overload)
+    IsTree - public function
+    ToString - public function (2 overloads: no-arg, with split string)
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -33,17 +72,10 @@ namespace smth
     /// <typeparam name="T">Type of the node</typeparam>
     public class CookieGraphNode<T> 
     {
-        /// <summary>
-        /// Node value
-        /// </summary>
         private T value;
         private CookieNodeList<CookieGraphNode<T>> neighbours;
 
 
-        /// <summary>
-        /// Class setter
-        /// </summary>
-        public CookieGraphNode() { this.value = default; this.neighbours = new(); }
         /// <summary>
         /// Class setter with variable
         /// </summary>
@@ -96,13 +128,6 @@ namespace smth
         public void SetNewNeighbour(CookieGraphNode<T> new_value)
         { if (!this.neighbours.Contains(new_value)) this.neighbours.Append(new_value); }
 
-        /// <summary>
-        /// The function saves next node
-        /// </summary>
-        /// <param name="new_value">The next node</param>
-        public void SetNewNeighbour(T new_value)
-        { this.SetNewNeighbour(new CookieGraphNode<T>(new_value)); }
-
 
         /// <summary>
         /// The function saves next node
@@ -111,12 +136,6 @@ namespace smth
         public void RemoveNeighbour(CookieGraphNode<T> new_value)
         { this.neighbours.Remove(new_value); }
 
-        /// <summary>
-        /// The function saves next node
-        /// </summary>
-        /// <param name="new_value">The next node</param>
-        public void RemoveNeighbour(T new_value)
-        { this.RemoveNeighbour(new CookieGraphNode<T>(new_value)); }
 
 
         // override:
@@ -134,7 +153,12 @@ namespace smth
         } // override ToString
 
 
-        public override bool Equals(object? obj)
+        /// <summary>
+        /// Checks equality against another CookieGraphNode (by value) or a raw value of type T
+        /// </summary>
+        /// <param name="obj">A CookieGraphNode&lt;T&gt; or a value of type T to compare against</param>
+        /// <returns>True if the value matches; otherwise false</returns>
+        public override bool Equals(object obj)
         {
             if (obj is CookieGraphNode<T>) return this.Value.Equals(((CookieGraphNode<T>)obj).Value);
             if (obj is T) return this.Value.Equals((T)obj);
@@ -155,6 +179,10 @@ namespace smth
     {
         private CookieNodeList<CookieGraphNode<GraphType>> nodes;
 
+
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public CookieGraph()
         { this.nodes = new CookieNodeList<CookieGraphNode<GraphType>>(); }
 
@@ -162,9 +190,15 @@ namespace smth
 
         // Getters:
 
+        /// <summary>
+        /// Returns the values of all neighbours (outgoing edges) of a vertex
+        /// </summary>
+        /// <param name="value">Vertex to look up</param>
+        /// <returns>List of neighbouring values</returns>
+        /// <exception cref="KeyNotFoundException">If the vertex doesn't exist</exception>
         public CookieNodeList<GraphType> Neighbours(GraphType value)
         {
-            if (!this.Contains(value)) throw new KeyNotFoundException();
+            if (!this.Contains(value)) throw new CookieValueNotFoundException(value);
             CookieNodeList<GraphType> nodes = new CookieNodeList<GraphType>();
             foreach (var node in this.GetNode(value).Neighbours)
                 nodes.Append(node.Value);
@@ -172,6 +206,11 @@ namespace smth
         } // Neighbours
 
 
+        /// <summary>
+        /// Finds the internal graph node holding a given value
+        /// </summary>
+        /// <param name="value">Value to look for</param>
+        /// <returns>The matching CookieGraphNode, or null if not found</returns>
         private CookieGraphNode<GraphType> GetNode(GraphType value)
         {
             foreach (var node in this.nodes)
@@ -180,6 +219,10 @@ namespace smth
         } // GetNode
 
 
+        /// <summary>
+        /// Returns every edge in the graph as (from, to) tuples
+        /// </summary>
+        /// <returns>List of edges, each a 2-element CookieTuple</returns>
         public CookieNodeList<CookieTuple<GraphType>> GetEdges()
         {
             var list = new CookieNodeList<CookieTuple<GraphType>>();
@@ -192,6 +235,11 @@ namespace smth
 
         // Special case: Contains
 
+        /// <summary>
+        /// Checks if a vertex with the given value exists in the graph
+        /// </summary>
+        /// <param name="value">Value to look for</param>
+        /// <returns>True if found</returns>
         public bool Contains(GraphType value)
         { return this.nodes.Contains(GetNode(value)); }
 
@@ -199,6 +247,10 @@ namespace smth
 
         // Count
 
+        /// <summary>
+        /// Returns the number of vertices in the graph
+        /// </summary>
+        /// <returns>Vertex count</returns>
         public int VertexCount()
         { return this.nodes.Count; }
 
@@ -214,9 +266,19 @@ namespace smth
             return count;
         } // EdgeCount
 
+        /// <summary>
+        /// Returns the number of outgoing edges from a vertex
+        /// </summary>
+        /// <param name="value">Vertex to check</param>
+        /// <returns>Number of outgoing edges</returns>
         public int OutDegree(GraphType value)
         { return this.GetNode(value).Neighbours.Count; }
 
+        /// <summary>
+        /// Returns the number of incoming edges to a vertex
+        /// </summary>
+        /// <param name="value">Vertex to check</param>
+        /// <returns>Number of incoming edges</returns>
         public int InDegree(GraphType value)
         {
             int count = 0;
@@ -231,18 +293,32 @@ namespace smth
 
         // Adders:
 
+        /// <summary>
+        /// Adds a new vertex to the graph, if it doesn't already exist
+        /// </summary>
+        /// <param name="value">Value of the new vertex</param>
         public void AddVertex(GraphType value)
         {
             if (this.Contains(value)) return;
             this.nodes.Append(new CookieGraphNode<GraphType>(value));
         } // AddVertex
 
+        /// <summary>
+        /// Adds a directed edge from one vertex to another
+        /// </summary>
+        /// <param name="from">Source vertex</param>
+        /// <param name="to">Destination vertex</param>
         public void AddEdge(GraphType from, GraphType to)
         {
             if (!(this.Contains(from) && this.Contains(to))) return;
             this.GetNode(from).SetNewNeighbour(this.GetNode(to));
         } // AddVertex
 
+        /// <summary>
+        /// Adds edges in both directions between two vertices (undirected edge)
+        /// </summary>
+        /// <param name="from">First vertex</param>
+        /// <param name="to">Second vertex</param>
         public void AddDoubleEdge(GraphType from, GraphType to)
         {
             if (!(this.Contains(from) && this.Contains(to))) return;
@@ -254,27 +330,44 @@ namespace smth
 
         // Removers:
 
+        /// <summary>
+        /// Removes a vertex and every edge pointing to or from it
+        /// </summary>
+        /// <param name="value">Vertex to remove</param>
         public void RemoveVertex(GraphType value)
         {
             if (!this.Contains(value)) return;
             this.nodes.Remove(new CookieGraphNode<GraphType>(value));
             foreach (var inner_node in this.nodes)
-                inner_node.RemoveNeighbour(value);
+                inner_node.RemoveNeighbour(new (value));
         } // RemoveVertex
 
+        /// <summary>
+        /// Removes the directed edge from one vertex to another
+        /// </summary>
+        /// <param name="from">Source vertex</param>
+        /// <param name="to">Destination vertex</param>
         public void RemoveEdge(GraphType from, GraphType to)
         {
             if (!(this.Contains(from) && this.Contains(to))) return;
-            this.GetNode(from).RemoveNeighbour(to);
+            this.GetNode(from).RemoveNeighbour(new (to));
         } // RemoveEdge
 
+        /// <summary>
+        /// Removes edges in both directions between two vertices
+        /// </summary>
+        /// <param name="from">First vertex</param>
+        /// <param name="to">Second vertex</param>
         public void RemoveDoubleEdge(GraphType from, GraphType to)
         {
             if (!(this.Contains(from) && this.Contains(to))) return;
-            this.GetNode(from).RemoveNeighbour(to);
-            this.GetNode(to).RemoveNeighbour(from);
+            this.GetNode(from).RemoveNeighbour(new(to));
+            this.GetNode(to).RemoveNeighbour(new(from));
         } // RemoveDoubleEdge
 
+        /// <summary>
+        /// Wipes the graph clean (removes all vertices and edges)
+        /// </summary>
         public void Clear()
         { this.nodes.Clear(); }
 
@@ -289,11 +382,17 @@ namespace smth
         /// <returns></returns>
         public CookieNodeList<GraphType> DepthFirstSearch(GraphType from)
         {
-            if (!Contains(from)) throw new KeyNotFoundException();
+            if (!Contains(from)) throw new CookieValueNotFoundException(from);
             CookieNodeList<GraphType> visited = new(), return_value = new(); 
             DepthFirstSearch(this.GetNode(from), visited, return_value);
             return return_value;
         } // DepthFirstSearch
+        /// <summary>
+        /// Recursively visits a node and all its unvisited neighbours, depth-first
+        /// </summary>
+        /// <param name="from">Node to visit from</param>
+        /// <param name="visited">Set of values already visited</param>
+        /// <param name="nodes">Accumulator list of values visited in order</param>
         private static void DepthFirstSearch(CookieGraphNode<GraphType> from, CookieNodeList<GraphType> visited, CookieNodeList<GraphType> nodes)
         {
             if (from == null || visited.Contains(from.Value)) return;
@@ -312,7 +411,7 @@ namespace smth
         /// <returns></returns>
         public CookieNodeList<GraphType> BreadthFirstSearch(GraphType from)
         {
-            if (!Contains(from)) throw new KeyNotFoundException();
+            if (!Contains(from)) throw new CookieValueNotFoundException(from);
 
             CookieNodeList<GraphType> visited = new();
             visited.Add(from);
@@ -339,6 +438,10 @@ namespace smth
         } // BreadthFirstSearch
 
 
+        /// <summary>
+        /// Yields a human-readable line for every edge in the graph
+        /// </summary>
+        /// <returns>Enumerator of strings like "from --> to"</returns>
         public IEnumerator<string> GetGraph()
         {
             foreach (var node in this.nodes)
@@ -349,12 +452,25 @@ namespace smth
 
         // Pathers:
 
+        /// <summary>
+        /// Checks if a path exists from one vertex to another, following directed edges
+        /// </summary>
+        /// <param name="from">Starting vertex</param>
+        /// <param name="to">Target vertex</param>
+        /// <returns>True if a path exists</returns>
         public bool HasPath(GraphType from, GraphType to)
         {
             if (!(Contains(from) && Contains(to))) return false;
             CookieNodeList<GraphType> visited = new();
             return HasPath(GetNode(from), to, visited);
         } // HasPath
+        /// <summary>
+        /// Recursively searches for a path from the current node to the target value
+        /// </summary>
+        /// <param name="current">Node currently being visited</param>
+        /// <param name="target">Value being searched for</param>
+        /// <param name="visited">Set of values already visited</param>
+        /// <returns>True if the target is reachable from here</returns>
         private static bool HasPath(CookieGraphNode<GraphType> current, GraphType target, CookieNodeList<GraphType> visited)
         {
             if (current == null) return false;
@@ -369,10 +485,20 @@ namespace smth
         } // HasPath
 
 
+        /// <summary>
+        /// Finds the shortest path (fewest edges) between two vertices using BFS
+        /// </summary>
+        /// <param name="from">Starting vertex</param>
+        /// <param name="to">Target vertex</param>
+        /// <returns>List of vertices from 'from' to 'to', inclusive</returns>
+        /// <exception cref="KeyNotFoundException">If either vertex doesn't exist</exception>
+        /// <exception cref="Exception">If no path exists between the vertices</exception>
         public CookieNodeList<GraphType> ShortestPath(GraphType from, GraphType to)
         {
-            if (!(Contains(from) && Contains(to)))
-                throw new KeyNotFoundException();
+            if (!Contains(from))
+                throw new CookieValueNotFoundException(from);
+            else if (!Contains(to))
+                throw new CookieValueNotFoundException(to);
 
             CookieQueue<CookieGraphNode<GraphType>> queue = new();
             queue.Insert(GetNode(from));
@@ -396,7 +522,7 @@ namespace smth
                     } // if
             } // while
 
-            if (!visited.Contains(to)) throw new Exception($"No path from {from} to {to}");
+            if (!visited.Contains(to)) throw new CookieStructureArgumentException($"no path from {from} to {to}");
             CookieNodeList<GraphType> result = new();
 
             GraphType current_value = to;
@@ -412,12 +538,24 @@ namespace smth
 
 
 
+        /// <summary>
+        /// Checks if the graph contains a cycle (a path that loops back to a previously visited vertex)
+        /// KNOWN LIMITATION!!!
+        /// for an undirected graph built with AddDoubleEdge, HasCycle() always returns true
+        /// </summary>
+        /// <returns>True if a cycle is found</returns>
         public bool HasCycle()
         {
             foreach (CookieGraphNode<GraphType> root in this.nodes)
                 if (HasCycle(root, new())) return true;
             return false;
         } // HasCycle
+        /// <summary>
+        /// Recursively checks if revisiting an already-visited node is reachable from the current node
+        /// </summary>
+        /// <param name="current">Node currently being visited</param>
+        /// <param name="visited">Set of values already visited along this path</param>
+        /// <returns>True if a previously visited value is reached again</returns>
         private static bool HasCycle(CookieGraphNode<GraphType> current, CookieNodeList<GraphType> visited)
         {
             if (current == null) return false;
@@ -431,6 +569,10 @@ namespace smth
         } // HasCycle
 
 
+        /// <summary>
+        /// Checks if the graph is a tree: no cycles, and every vertex reachable from some root
+        /// </summary>
+        /// <returns>True if the graph forms a tree</returns>
         public bool IsTree()
         {
             if (HasCycle()) return false;
@@ -468,11 +610,19 @@ namespace smth
 
 
         // IEnumerable
+        /// <summary>
+        /// Returns an enumerator over all vertex values in the graph (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator over the graph's vertex values</returns>
         public IEnumerator<GraphType> GetEnumerator()
         { 
             foreach (var node in this.nodes)
                 yield return node.Value;
         } // GetEnumerator
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over the graph's vertex values</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     } // CookieGraph

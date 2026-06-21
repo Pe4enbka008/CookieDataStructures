@@ -21,6 +21,33 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieNode contains
+    GetValue - public function
+    SetValue - public function
+    GetNext - public function
+    SetNext - public function
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    ToString - public function
+    Equals - public function
+
+CookieDataStructure: CookieNodeWorker contains
+    ArrayToNodes - public static function
+    CreateStringList - public static function
+    CreateList - public static function (4 overloads: string, int/double/float, char, bool)
+    MakeNodesPrintable - public static function
+    RecursionSum - public static function
+    ContainsElement - public static function
+    Reverse - public static function
+    RecursionCount - public static function
+    RecursionCountElement - public static function
+    Remove - public static function
+    Append - public static function
+    Add - public static function
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -36,10 +63,6 @@ namespace smth
         private CookieNode<T>? next;
 
 
-        /// <summary>
-        /// Class setter
-        /// </summary>
-        public CookieNode() { this.value = default; this.next = null; }
         /// <summary>
         /// Class setter with valuable
         /// </summary>
@@ -99,18 +122,15 @@ namespace smth
         /// <param name="new_value">The next node</param>
         public void SetNext(CookieNode<T>? new_value)
         { this.next = new_value; }
-
-        /// <summary>
-        /// The function saves next node
-        /// </summary>
-        /// <param name="new_value">The next node</param>
-        public void SetNext(T new_value)
-        { this.next = new(new_value); }
        
 
 
         // override:
         // IEnumerable
+        /// <summary>
+        /// Iterates over this node and every node reachable via Next (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator that yields this node's value, then each subsequent node's value</returns>
         public IEnumerator<T> GetEnumerator() // foreach!
         {
             CookieNode<T>? current = this;
@@ -120,6 +140,10 @@ namespace smth
                 current = current.Next;
             } // while
         } // GetEnumerator
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over this node's linked values</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
@@ -131,6 +155,11 @@ namespace smth
         public override string ToString()
         { return $"{this.value}"; }
 
+        /// <summary>
+        /// Checks equality against another CookieNode (by value) or a raw value of type T
+        /// </summary>
+        /// <param name="obj">A CookieNode&lt;T&gt; or a value of type T to compare against</param>
+        /// <returns>True if the value matches; otherwise false</returns>
         public override bool Equals(object? obj)
         {
             if (obj is CookieNode<T>) return this.Value.Equals(((CookieNode<T>)obj).Value);
@@ -159,6 +188,7 @@ namespace smth
         {
             if (list == null || list.Length == 0)
                 return null;
+
             CookieNode<T> nodes = null, current = null;
             foreach (T elem in list)
             {
@@ -227,6 +257,7 @@ namespace smth
                 least_letter_count = 0;
             if (most_letter_count < 4)
                 most_letter_count = 10000;
+
             CookieNode<string> list = CreateStringList(length);
             while (length > 0)
             {

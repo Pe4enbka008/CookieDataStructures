@@ -20,6 +20,59 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieBinNode contains
+    GetValue - public function
+    GetLeft - public function
+    GetRight - public function
+    SetValue - public function
+    SetLeft - public function
+    SetRight - public function 
+    operator > - public static function (2 overloads: CookieBinNode<T>, T)
+    operator < - public static function (2 overloads: CookieBinNode<T>, T)
+    ToString - public function
+
+CookieDataStructure: CookieHoldingLineHelper contains
+    Print2LinkedList - private static function (2-arg helper) and public static function (1-arg, overloaded)
+    Print2LinkedListRight - public static function
+    Print2LinkedListLeftRecursive - public static function
+    Print2LinkedListLeft - public static function
+    AddRight - public static function (2 overloads: T, CookieBinNode<T>)
+    AddLeft - public static function (2 overloads: T, CookieBinNode<T>)
+    AddToHead - public static function (2 overloads: T, CookieBinNode<T>)
+    AddToTail - public static function (2 overloads: T, CookieBinNode<T>)
+    GetLeftest - public static function
+    GetRightest - public static function
+
+CookieDataStructure: CookieTree contains
+    IsEmpty - public function
+    Insert - public function
+    InsertRecursive - private function
+    Remove - public function
+    RemoveRecursive - private function
+    Search - public function
+    SearchRecursive - private function
+    Length - public function
+    CountElements - private function
+    Count - public function
+    CountElement - private function
+    CountLeaves - public function (and matching private overload)
+    GetHight - public function (and matching private overload)
+    IsFull - public function (and matching private overload)
+    IsComplete - public function (and matching private overload)
+    IsSpanningTree - public function (and matching private overload)
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    InOrderYield - private function
+    InOrderTraversal - public function
+    InOrderRecursive - private function
+    PreOrderTraversal - public function
+    PreOrderRecursive - private function
+    PostOrderTraversal - public function
+    PostOrderRecursive - private function
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -43,47 +96,81 @@ namespace smth
             this.right = null;
         } // __init__
         /// <summary>
-        /// Really basicCookieBinNode constructor
+        /// CookieBinNode constructor
         /// </summary>
-        public CookieBinNode() : this(default)   // for setters
-        { }
+        /// <param name="value">value to save in the node</param>
+        /// <param name="left">left node</param>
+        /// <param name="right">right node</param>
+        public CookieBinNode(T value, CookieBinNode<T> left, CookieBinNode<T> right)
+        {
+            this.value = value;
+            this.left = left;
+            this.right = right;
+        } // __init__
+
 
         // Getters/Setters
 
+        /// <summary>Gets the value stored in this node</summary>
         public T Value { get { return this.value; } }
+        /// <summary>Gets the left child node</summary>
         public CookieBinNode<T>? Left { get { return this.left; } }
+        /// <summary>Gets the right child node</summary>
         public CookieBinNode<T>? Right { get { return this.right; } }
 
+        /// <summary>Returns the value stored in this node</summary>
+        /// <returns>The node's value</returns>
         public T GetValue() { return this.value; }
+        /// <summary>Returns the left child node</summary>
+        /// <returns>The left child, or null if there isn't one</returns>
         public CookieBinNode<T>? GetLeft() { return this.Left; }
+        /// <summary>Returns the right child node</summary>
+        /// <returns>The right child, or null if there isn't one</returns>
         public CookieBinNode<T>? GetRight() { return this.Right; }
 
 
+        /// <summary>Sets the value stored in this node</summary>
+        /// <param name="value">New value to store</param>
         public void SetValue(T value) { this.value = value; }
+
+        /// <summary>Sets the left child to an existing node</summary>
+        /// <param name="value">The node to use as the left child</param>
         public void SetLeft(CookieBinNode<T>? value) { this.left = value; }
-        public void SetLeft(T? value) { this.left = new(value); }
+
+        /// <summary>Sets the right child to an existing node</summary>
+        /// <param name="value">The node to use as the right child</param>
         public void SetRight(CookieBinNode<T>? value) { this.right = value; }
-        public void SetRight(T? value) { this.right = new(value); }
+
 
 
 
         // For tree:
+        /// <summary>Compares two nodes' values</summary>
+        /// <returns>True if a's value is greater than b's value</returns>
         public static bool operator >(CookieBinNode<T> a, CookieBinNode<T> b)
         { return Comparer<T>.Default.Compare(a.Value, b.Value) > 0; }
 
+        /// <summary>Compares two nodes' values</summary>
+        /// <returns>True if a's value is less than b's value</returns>
         public static bool operator <(CookieBinNode<T> a, CookieBinNode<T> b)
         { return Comparer<T>.Default.Compare(a.Value, b.Value) < 0; }
 
 
+        /// <summary>Compares a node's value against a raw value</summary>
+        /// <returns>True if a's value is greater than b</returns>
         public static bool operator >(CookieBinNode<T> a, T b)
         { return Comparer<T>.Default.Compare(a.Value, b) > 0; }
 
+        /// <summary>Compares a node's value against a raw value</summary>
+        /// <returns>True if a's value is less than b</returns>
         public static bool operator <(CookieBinNode<T> a, T b)
         { return Comparer<T>.Default.Compare(a.Value, b) < 0; }
 
 
 
         // override:
+        /// <summary>Returns the value stored in this node as a string</summary>
+        /// <returns>Value as a string</returns>
         public override string ToString()
         { return $"{this.value}"; }
 
@@ -96,8 +183,14 @@ namespace smth
     /// </summary>
     public class CookieHoldingLineHelper
     {
+        private static string className = "CookieHoldingLineHelper";
+
         // prints:
 
+        /// <summary>Internal recursive helper for printing a binary node as a doubly-linked list</summary>
+        /// <param name="bin_node">Node to print from</param>
+        /// <param name="start_printing">Whether printing has reached the leftmost node yet</param>
+        /// <returns>String fragment of the linked-list representation</returns>
         private static string Print2LinkedList<T>(CookieBinNode<T> bin_node, bool start_printing)
         {
             string return_string = "";
@@ -110,13 +203,22 @@ namespace smth
             return return_string;
         } // Print2LinkedList
 
+        /// <summary>Prints the tree/list as a doubly-linked list, left to right, starting from null</summary>
+        /// <param name="bin_node">Any node in the linked structure</param>
+        /// <returns>String like "null -> a -> b -> c -> null"</returns>
         public static string Print2LinkedList<T>(CookieBinNode<T> bin_node)
         { return "null -> " + Print2LinkedList(bin_node, bin_node.GetLeft() == null) + "null"; }
 
+        /// <summary>Prints the structure rightward starting from the given node</summary>
+        /// <param name="bin_node">Node to start printing from</param>
+        /// <returns>String like "a -> b -> c -> null"</returns>
         public static string Print2LinkedListRight<T>(CookieBinNode<T> bin_node)
         { return Print2LinkedList(bin_node, true) + "null"; }
 
 
+        /// <summary>Recursively builds a leftward string representation ending at the given node</summary>
+        /// <param name="bin_node">Node to print up to</param>
+        /// <returns>String fragment like " <- a <- b"</returns>
         public static string Print2LinkedListLeftRecursive<T>(CookieBinNode<T> bin_node)
         {
             if (bin_node != null)
@@ -124,12 +226,18 @@ namespace smth
             return "";
         } // Print2LinkedListLeftRecursive
 
+        /// <summary>Prints the structure leftward, starting from null, up to the given node</summary>
+        /// <param name="bin_node">Node to print up to</param>
+        /// <returns>String like "null <- a <- b <- c"</returns>
         public static string Print2LinkedListLeft<T>(CookieBinNode<T> bin_node)
         { return "null" + Print2LinkedListLeftRecursive(bin_node); }
 
 
         // Adds:
 
+        /// <summary>Inserts a new node holding the given value to the right of bin_node, fixing up neighbouring links</summary>
+        /// <param name="bin_node">Node to insert after</param>
+        /// <param name="value">Value to wrap in a new node and insert</param>
         public static void AddRight<T>(CookieBinNode<T> bin_node, T value)
         {
             if (bin_node != null)
@@ -143,6 +251,9 @@ namespace smth
                     temp.GetRight().SetLeft(temp);
             } // if
         } // AddRight
+        /// <summary>Inserts an existing node to the right of bin_node, fixing up neighbouring links</summary>
+        /// <param name="bin_node">Node to insert after</param>
+        /// <param name="value">Node to insert</param>
         public static void AddRight<T>(CookieBinNode<T> bin_node, CookieBinNode<T> value)
         {
             if (bin_node != null)
@@ -155,6 +266,9 @@ namespace smth
             } // if
         } // AddRight
 
+        /// <summary>Inserts a new node holding the given value to the left of bin_node, fixing up neighbouring links</summary>
+        /// <param name="bin_node">Node to insert before</param>
+        /// <param name="value">Value to wrap in a new node and insert</param>
         public static void AddLeft<T>(CookieBinNode<T> bin_node, T value)
         {
             if (bin_node != null)
@@ -168,6 +282,9 @@ namespace smth
                     temp.GetLeft().SetRight(temp);
             } // if
         } // AddLeft
+        /// <summary>Inserts an existing node to the left of bin_node, fixing up neighbouring links</summary>
+        /// <param name="bin_node">Node to insert before</param>
+        /// <param name="value">Node to insert</param>
         public static void AddLeft<T>(CookieBinNode<T> bin_node, CookieBinNode<T> value)
         {
             if (bin_node != null)
@@ -180,6 +297,9 @@ namespace smth
             } // if
         } // AddLeft
 
+        /// <summary>Wraps a value in a new node and inserts it as the new leftmost (head) node</summary>
+        /// <param name="bin_node">Any node in the structure</param>
+        /// <param name="value">Value to wrap and insert at the head</param>
         public static void AddToHead<T>(CookieBinNode<T> bin_node, T value)
         {
             if (bin_node == null) return;
@@ -188,6 +308,9 @@ namespace smth
             left.SetLeft(newNode);
             newNode.SetRight(left);
         } // AddToHead
+        /// <summary>Inserts an existing node as the new leftmost (head) node</summary>
+        /// <param name="bin_node">Any node in the structure</param>
+        /// <param name="value">Node to insert at the head</param>
         public static void AddToHead<T>(CookieBinNode<T> bin_node, CookieBinNode<T> value)
         {
             if (bin_node == null) return;
@@ -196,6 +319,9 @@ namespace smth
             value.SetRight(left);
         } // AddToHead
 
+        /// <summary>Wraps a value in a new node and inserts it as the new rightmost (tail) node</summary>
+        /// <param name="bin_node">Any node in the structure</param>
+        /// <param name="value">Value to wrap and insert at the tail</param>
         public static void AddToTail<T>(CookieBinNode<T> bin_node, T value)
         {
             if (bin_node == null) return;
@@ -204,6 +330,9 @@ namespace smth
             right.SetRight(newNode);
             newNode.SetLeft(right);
         } // AddToTail
+        /// <summary>Inserts an existing node as the new rightmost (tail) node</summary>
+        /// <param name="bin_node">Any node in the structure</param>
+        /// <param name="value">Node to insert at the tail</param>
         public static void AddToTail<T>(CookieBinNode<T> bin_node, CookieBinNode<T> value)
         {
             if (bin_node == null) return;
@@ -214,29 +343,30 @@ namespace smth
 
 
 
+        /// <summary>Walks left from the given node until it finds the leftmost node</summary>
+        /// <param name="bin_node">Node to start walking from</param>
+        /// <returns>The leftmost node, or default if bin_node is null</returns>
         public static CookieBinNode<T> GetLeftest<T>(CookieBinNode<T> bin_node)
         {
             if (bin_node == null)
-                return default;
+                throw new CookieEmptyStructureException(className);
             if (bin_node.Left == null)
                 return bin_node;
             return GetLeftest(bin_node.Left);
         } // GetLeftest
-        public static T GetLeftestValue<T>(CookieBinNode<T> bin_node)
-        { return GetLeftest(bin_node).Value; } 
 
 
+        /// <summary>Walks right from the given node until it finds the rightmost node</summary>
+        /// <param name="bin_node">Node to start walking from</param>
+        /// <returns>The rightmost node, or default if bin_node is null</returns>
         public static CookieBinNode<T> GetRightest<T>(CookieBinNode<T> bin_node)
         {
             if (bin_node == null)
-                return default;
+                throw new CookieEmptyStructureException(className);
             if (bin_node.Right == null)
                 return bin_node;
             return GetRightest(bin_node.Right);
         } // GetRightest
-        public static T GetRightestValue<T>(CookieBinNode<T> bin_node)
-        { return GetRightest(bin_node).Value; }
-
 
 
     } // CookieHoldingLineHelper
@@ -249,24 +379,47 @@ namespace smth
     /// </summary>
     /// <typeparam name="TreeType">Type of the binary tree</typeparam>6
     public class CookieTree<TreeType> : IEnumerable<TreeType>
-    {
+    { 
         private CookieBinNode<TreeType>? root;
 
+        private static string className = "CookieTree";
+
+        /// <summary>
+        /// Class constructor that builds a tree on top of an existing root node
+        /// </summary>
+        /// <param name="root">The node to use as root</param>
         public CookieTree(CookieBinNode<TreeType> root)
         { this.root = root; }
 
+        /// <summary>
+        /// Class constructor for an empty tree
+        /// </summary>
         public CookieTree() : this(null)
         { }
 
 
+        /// <summary>
+        /// Returns if the tree is empty
+        /// </summary>
+        /// <returns>True if the tree has no root</returns>
         public bool IsEmpty()
         { return this.root == null; }
 
 
         // insert:
 
+        /// <summary>
+        /// Inserts a value into the tree, keeping binary-search-tree order
+        /// </summary>
+        /// <param name="value">Value to insert</param>
         public void Insert(TreeType value)
         { this.root = InsertRecursive(this.root, value); }
+        /// <summary>
+        /// Recursively finds the correct spot for a value and inserts it there
+        /// </summary>
+        /// <param name="root">Subtree root to insert into</param>
+        /// <param name="value">Value to insert</param>
+        /// <returns>The (possibly new) subtree root</returns>
         private CookieBinNode<TreeType> InsertRecursive(CookieBinNode<TreeType> root, TreeType value)
         {
             if (root == null)
@@ -285,12 +438,22 @@ namespace smth
 
         // remove:
 
+        /// <summary>
+        /// Removes a value from the tree, keeping binary-search-tree order
+        /// </summary>
+        /// <param name="value">Value to remove</param>
         public void Remove(TreeType value)
         { this.root = RemoveRecursive(this.root, value); }
+        /// <summary>
+        /// Recursively finds and removes a value, re-attaching the remaining subtrees
+        /// </summary>
+        /// <param name="root">Subtree root to remove from</param>
+        /// <param name="value">Value to remove</param>
+        /// <returns>The (possibly new) subtree root</returns>
         private CookieBinNode<TreeType> RemoveRecursive(CookieBinNode<TreeType> root, TreeType value)
         {
             if (root == null)
-                return root;
+                throw new CookieEmptyStructureException(className);
 
             if (root > value)
                 root.SetLeft(RemoveRecursive(root.Left, value));
@@ -312,12 +475,23 @@ namespace smth
 
         // funzies:
 
+        /// <summary>
+        /// Searches the tree for a value
+        /// </summary>
+        /// <param name="value">Value to look for</param>
+        /// <returns>True if the value is found</returns>
         public bool Search(TreeType value)
         { return SearchRecursive(this.root, value); }
+        /// <summary>
+        /// Recursively searches a subtree for a value
+        /// </summary>
+        /// <param name="root">Subtree root to search</param>
+        /// <param name="value">Value to look for</param>
+        /// <returns>True if the value is found</returns>
         private bool SearchRecursive(CookieBinNode<TreeType> root, TreeType value)
         {
             if (root == null)
-                return false;
+                throw new CookieEmptyStructureException(className);
 
             if (root.Value.Equals(value))
                 return true;
@@ -329,8 +503,17 @@ namespace smth
         } // SearchRecursive
 
 
+        /// <summary>
+        /// Returns the total number of nodes in the tree
+        /// </summary>
+        /// <returns>Number of nodes</returns>
         public int Length()
         { return CountElements(this.root); }
+        /// <summary>
+        /// Recursively counts the nodes in a subtree
+        /// </summary>
+        /// <param name="root">Subtree root to count from</param>
+        /// <returns>Number of nodes in the subtree</returns>
         private int CountElements(CookieBinNode<TreeType> root)
         {
             if (root == null)
@@ -339,8 +522,19 @@ namespace smth
         } // CountElements
 
 
+        /// <summary>
+        /// Counts how many times a value appears in the tree
+        /// </summary>
+        /// <param name="value">Value to count</param>
+        /// <returns>Number of matching nodes</returns>
         public int Count(TreeType value)
         { return CountElement(this.root, value); }
+        /// <summary>
+        /// Recursively counts how many times a value appears in a subtree
+        /// </summary>
+        /// <param name="root">Subtree root to count from</param>
+        /// <param name="value">Value to count</param>
+        /// <returns>Number of matching nodes</returns>
         private int CountElement(CookieBinNode<TreeType> root, TreeType value)
         {
             if (root == null)
@@ -352,8 +546,17 @@ namespace smth
         } // CountElement
 
 
+        /// <summary>
+        /// Counts the number of leaf nodes (nodes with no children) in the tree
+        /// </summary>
+        /// <returns>Number of leaf nodes</returns>
         public int CountLeaves()
         { return CountLeaves(this.root); }
+        /// <summary>
+        /// Recursively counts leaf nodes in a subtree
+        /// </summary>
+        /// <param name="root">Subtree root to count from</param>
+        /// <returns>Number of leaf nodes in the subtree</returns>
         private int CountLeaves(CookieBinNode<TreeType> root)
         {
             if (root == null)
@@ -365,8 +568,17 @@ namespace smth
         } // CountLeaves
 
 
+        /// <summary>
+        /// Returns the height of the tree
+        /// </summary>
+        /// <returns>The tree's height</returns>
         public int GetHight()
         { return GetHight(this.root); }
+        /// <summary>
+        /// Recursively computes the height of a subtree
+        /// </summary>
+        /// <param name="root">Subtree root to measure</param>
+        /// <returns>Height of the subtree</returns>
         private int GetHight(CookieBinNode<TreeType> root) 
         {
             if (root == null) return 0;
@@ -378,8 +590,17 @@ namespace smth
 
         // type of trees:
 
+        /// <summary>
+        /// Checks if every node has either 0 or 2 children (a "full" binary tree)
+        /// </summary>
+        /// <returns>True if the tree is full</returns>
         public bool IsFull()
-        { return IsFull(this.root); }
+        { return this.root != null && IsFull(this.root); }
+        /// <summary>
+        /// Recursively checks if every node in a subtree has either 0 or 2 children
+        /// </summary>
+        /// <param name="bin_tree">Subtree root to check</param>
+        /// <returns>True if the subtree is full</returns>
         private bool IsFull(CookieBinNode<TreeType>? bin_tree) // 17 
         {
             if (bin_tree == null)
@@ -389,8 +610,18 @@ namespace smth
         } // IsFull
 
 
+        /// <summary>
+        /// Checks if the tree is complete (every level is filled left to right, with no gaps)
+        /// </summary>
+        /// <returns>True if the tree is complete</returns>
         public bool IsComplete()
-        { return IsComplete(this.root); }
+        { return this.root != null && IsComplete(this.root); }
+        /// <summary>
+        /// Performs a breadth-first walk checking that no node has a right child without
+        /// a left child, and that no children appear after an empty slot was seen
+        /// </summary>
+        /// <param name="bin_tree">Subtree root to check</param>
+        /// <returns>True if the subtree is complete</returns>
         private bool IsComplete(CookieBinNode<TreeType>? bin_tree)
         {
             if (bin_tree == null)
@@ -398,8 +629,7 @@ namespace smth
 
             CookieQueue<CookieBinNode<TreeType>> check_list = new(bin_tree);
             bool reached_empty = false;
-
-            while (check_list.IsEmpty())
+            while (!check_list.IsEmpty())
             {
                 CookieBinNode<TreeType> current = check_list.RemoveValue();
                 if (current.Left != null)
@@ -421,9 +651,18 @@ namespace smth
         } // IsComplete
 
 
+        /// <summary>
+        /// Checks if the tree satisfies binary-search-tree ordering at every node
+        /// </summary>
+        /// <returns>True if the tree is correctly ordered as a BST</returns>
         public bool IsSpanningTree()
-        { return IsComplete(this.root); }
+        { return this.root != null && IsSpanningTree(this.root); }
 
+        /// <summary>
+        /// Recursively checks BST ordering: every left child must be smaller, every right child larger
+        /// </summary>
+        /// <param name="nodes">Subtree root to check</param>
+        /// <returns>True if the subtree satisfies BST ordering</returns>
         private bool IsSpanningTree(CookieBinNode<TreeType>? nodes)
         {
             if (nodes == null) return true;
@@ -439,29 +678,53 @@ namespace smth
 
 
         // IEnumerable
+        /// <summary>
+        /// Returns an enumerator that walks the tree in-order (enables foreach)
+        /// </summary>
+        /// <returns>An in-order enumerator over the tree's values</returns>
         public IEnumerator<TreeType> GetEnumerator()
-        { if (root != null) return InOrderYeald(root); return Enumerable.Empty<TreeType>().GetEnumerator(); }
+        // FIX: was "InOrderYeald(root)" (typo, undefined method) - corrected to InOrderYield and
+        // added ".GetEnumerator()" since InOrderYield returns IEnumerable<TreeType>, not IEnumerator<TreeType>
+        { if (root != null) return InOrderYield(root).GetEnumerator(); return Enumerable.Empty<TreeType>().GetEnumerator(); }
+        /// <summary>
+        /// Recursively yields values in in-order (left, node, right)
+        /// </summary>
+        /// <param name="node">Subtree root to yield from</param>
+        /// <returns>Values in in-order sequence</returns>
         private IEnumerable<TreeType> InOrderYield(CookieBinNode<TreeType>? node)
         {
             if (node == null)
                 yield break;
 
-            foreach (var v in InOrderYeald(node.Left))
+            foreach (var v in InOrderYield(node.Left))
                 yield return v;
 
             yield return node.Value;
 
-            foreach (var v in InOrderYeald(node.Right))
+            foreach (var v in InOrderYield(node.Right))
                 yield return v;
         } // InOrderYield
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An in-order enumerator over the tree's values</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
 
         // prints:
 
+        /// <summary>
+        /// Returns the tree's values as a space-separated string in in-order (left, node, right)
+        /// </summary>
+        /// <returns>In-order traversal as a string</returns>
         public string InOrderTraversal()
         { return InOrderRecursive(this.root); }
+        /// <summary>
+        /// Recursively builds an in-order traversal string
+        /// </summary>
+        /// <param name="root">Subtree root to traverse</param>
+        /// <returns>String fragment of values in in-order sequence</returns>
         private string InOrderRecursive(CookieBinNode<TreeType> root)
         {
             string return_value = "";
@@ -475,8 +738,17 @@ namespace smth
         } // InOrderRecursive
 
 
+        /// <summary>
+        /// Returns the tree's values as a space-separated string in pre-order (node, left, right)
+        /// </summary>
+        /// <returns>Pre-order traversal as a string</returns>
         public string PreOrderTraversal()
         { return PreOrderRecursive(this.root); }
+        /// <summary>
+        /// Recursively builds a pre-order traversal string
+        /// </summary>
+        /// <param name="root">Subtree root to traverse</param>
+        /// <returns>String fragment of values in pre-order sequence</returns>
         private string PreOrderRecursive(CookieBinNode<TreeType> root)
         {
             string return_value = "";
@@ -490,8 +762,17 @@ namespace smth
         } // PreOrderRecursive
 
 
+        /// <summary>
+        /// Returns the tree's values as a space-separated string in post-order (left, right, node)
+        /// </summary>
+        /// <returns>Post-order traversal as a string</returns>
         public string PostOrderTraversal()
         { return PostOrderRecursive(this.root); }
+        /// <summary>
+        /// Recursively builds a post-order traversal string
+        /// </summary>
+        /// <param name="root">Subtree root to traverse</param>
+        /// <returns>String fragment of values in post-order sequence</returns>
         private string PostOrderRecursive(CookieBinNode<TreeType> root)
         {
             string return_value = "";

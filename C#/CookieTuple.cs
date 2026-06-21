@@ -20,6 +20,26 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieTuple contains
+    IsEmpty - public function
+    RecursionCount - private static function
+    CountElementDuplicates - public function
+    CountElementDuplicatesLoop - private function
+    GetIndex - public function
+    Find - public function
+    Get - public function
+    GetFirst - public function
+    Contains - public function
+    Copy - public function
+    ChangeType - public function
+    PartlyChangeType - public function
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    ToString - public function (2 overloads: no-arg, with split string)
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -30,6 +50,9 @@ namespace smth
     public class CookieTuple<TupleType> : IEnumerable<TupleType>
     {
         private CookieNode<TupleType> head_node;
+
+        private static string className = "CookieTuple";
+
 
         // Builders:
         /// <summary>
@@ -137,13 +160,14 @@ namespace smth
         } // ListType
 
         /// <summary>
-        /// Finds index of the item inputted. If the item is not found, returns -1
+        /// Finds index of the item inputted. If the item is not found, throws Exception
         /// </summary>
         /// <param name="item">an item that needs to be found</param>
         /// <returns>Int represented index</returns>
         public int GetIndex(TupleType item)
         {
-            if (this.head_node == null) return -1;
+            if (this.head_node == null) 
+                throw new CookieValueNotFoundException(item);
 
             CookieNode<TupleType> some_node = this.head_node;
             int counter = 0;
@@ -155,10 +179,10 @@ namespace smth
                 counter++;
                 some_node = some_node.GetNext();
             } // while
-            return -1;
+            throw new CookieValueNotFoundException(item);
         } // GetIndex
         /// <summary>
-        /// Finds index of the item inputted. If the item is not found, returns -1
+        /// Finds index of the item inputted. If the item is not found, throws Exception
         /// </summary>
         /// <param name="item">an item that needs to be found</param>
         /// <returns>Int represented index</returns>
@@ -173,7 +197,8 @@ namespace smth
         /// <exception cref="IndexOutOfRangeException">If the index is out-of-range</exception>
         public TupleType Get(int index)
         {
-            if (index < 0 || index >= RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
+            if (index < 0 || index >= RecursionCount(this.head_node)) 
+                throw new CookieIndexOutOfRangeException(index);
 
             CookieNode<TupleType>? some_node = this.head_node;
             for (; 0 < index; index--)
@@ -188,7 +213,7 @@ namespace smth
         public TupleType GetFirst()
         {
             if (this.head_node == null)
-                return (TupleType)(object)null;
+                throw new CookieEmptyStructureException(className);
             return this.Get(0);
         } // GetFirst
 
@@ -200,7 +225,15 @@ namespace smth
         /// <param name="item">An item to check for</param>
         /// <returns>Boolean if the the item found</returns>
         public bool Contains(TupleType item)
-        { if (this.head_node == null) return false; return this.GetIndex(item) != -1; }
+        {
+            try 
+            {
+                this.GetIndex(item);
+                return true;
+            } // try
+            catch (CookieEmptyStructureException)
+            { return false; }
+        } // Contains
 
         // Special case : copy value
         /// <summary>
@@ -213,14 +246,16 @@ namespace smth
 
         // Special case : change type
         /// <summary>
-        /// Changes the type of the list to the requested - be sure it's convertable!
+        /// Changes the type of the list to the requested - be sure it's convertible!
         /// </summary>
         /// <typeparam name="RequestedType">Type to change to</typeparam>
         /// <returns>If possible, the list, if not null list</returns>
-        public CookieTuple<RequestedType>? ChangeType<RequestedType>()
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
+        /// <exception cref="CookieStructureArgumentException">If conversion failed</exception>
+        public CookieTuple<RequestedType> ChangeType<RequestedType>()
         {
-            if (this.head_node == null) return null;
-            RequestedType[] new_list = new RequestedType[this.Length];
+            if (this.head_node == null) throw new CookieEmptyStructureException(className);
+            RequestedType[] save_list = new RequestedType[this.Length];
             int count = 0;
 
             CookieNode<TupleType>? nodes = this.head_node;
@@ -229,14 +264,18 @@ namespace smth
                 try
                 {
                     RequestedType value = (RequestedType)Convert.ChangeType(nodes.Value, typeof(RequestedType));
-                    new_list[count++] = value;
+                    save_list[count++] = value;
                 } // try
                 catch
-                { return null; } // conversion failed - break
+                { throw new CookieStructureArgumentException($"failed to convert to type {nameof(RequestedType)}"); } // conversion failed - return
 
                 nodes = nodes.Next;
             } // while
 
+            RequestedType[] new_list = new RequestedType[count];
+            count -= 1;
+            for (; count >= 0; count--)
+                new_list[count] = save_list[count];
             return new(new_list);
         } // ChangeType
 
@@ -245,10 +284,12 @@ namespace smth
         /// </summary>
         /// <typeparam name="RequestedType">Type to change to</typeparam>
         /// <returns>A list of possible values</returns>
-        public CookieNodeList<RequestedType>? PartlyChangeType<RequestedType>()
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
+        public CookieTuple<RequestedType> PartlyChangeType<RequestedType>()
         {
-            if (this.head_node == null) return null;
-            RequestedType[] new_list = new RequestedType[this.Length];
+            if (this.head_node == null) throw new CookieEmptyStructureException(className);
+            RequestedType[] save_list = new RequestedType[this.Length];
+            int count = 0;
 
             CookieNode<TupleType>? nodes = this.head_node;
             while (nodes != null)
@@ -256,7 +297,7 @@ namespace smth
                 try
                 {
                     RequestedType value = (RequestedType)Convert.ChangeType(nodes.Value, typeof(RequestedType));
-                    new_list[count++] = value;
+                    save_list[count++] = value;
                 } // try
                 catch
                 { } // conversion failed - do nothing
@@ -264,6 +305,10 @@ namespace smth
                 nodes = nodes.Next;
             } // while
 
+            RequestedType[] new_list = new RequestedType[count];
+            count -= 1;
+            for (; count >= 0; count--)
+                new_list[count] = save_list[count];
             return new(new_list);
         } // PartlyChangeType
 
@@ -271,8 +316,16 @@ namespace smth
         // override
 
          // IEnumerable
+        /// <summary>
+        /// Returns an enumerator that walks the tuple from first to last element (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator over the tuple's values, in order</returns>
         public IEnumerator<TupleType> GetEnumerator() 
         { return head_node.GetEnumerator(); }
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over the tuple's values, in order</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         
 

@@ -20,6 +20,26 @@
 */
 
 
+
+/*
+CookieDataStructure: CookieDict contains
+    IsEmpty - public function
+    GetList - public function
+    Get - public function
+    Set - public function
+    ContainsKey - public function
+    ContainsValueIn - public function
+    Remove - public function (2 overloads: key only, key and value)
+    RemoveAll - public function
+    Clear - public function
+    ToString - public function (2 overloads: no-arg, with split string)
+
+CookieDataStructure: CookieHash contains
+    GetAs - public function
+    GetListAs - public function
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -32,11 +52,18 @@ namespace smth
     {
         private CookieNodeList<KeyType> keys;
         private CookieNodeList<CookieNodeList<ValueType>> list_of_list_of_values;
+
+        private static string className = "CookieDict";
+
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public CookieDict()
         {
             keys = new CookieNodeList<KeyType>();
             list_of_list_of_values = new CookieNodeList<CookieNodeList<ValueType>>();
         } // __init__
+
 
         /// <summary>
         /// Returns the System List of the Keys
@@ -105,6 +132,10 @@ namespace smth
 
 
 
+        /// <summary>
+        /// Returns if the dictionary is empty
+        /// </summary>
+        /// <returns>True if there are no keys and no values</returns>
         public bool IsEmpty()
         { return this.keys.IsEmpty() && this.list_of_list_of_values.IsEmpty(); } 
 
@@ -129,7 +160,7 @@ namespace smth
         /// <param name="key">Key to the value(s)</param>
         /// <returns>The key list</returns>
         public CookieNodeList<ValueType> GetList(KeyType key)
-        { if (ContainsKey(key)) return list_of_list_of_values.Get(keys.Find(key)); throw new KeyNotFoundException(); }
+        { if (ContainsKey(key)) return list_of_list_of_values.Get(keys.Find(key)); throw new CookieValueNotFoundException(key); }
 
         /// <summary>
         /// Gets only one (first) value
@@ -137,7 +168,7 @@ namespace smth
         /// <param name="key">Key to the value(s)</param>
         /// <returns>The first accuring value in the key list</returns>
         public ValueType Get(KeyType key)
-        { if (ContainsKey(key)) return GetList(key).GetFirst(); throw new KeyNotFoundException(); }
+        { if (ContainsKey(key)) return GetList(key).GetFirst(); throw new CookieValueNotFoundException(key); }
 
 
         // Setters:
@@ -261,7 +292,10 @@ namespace smth
 
 
 
-    public class CookieHash : CookieDict<object, object?> // key: obj and value: obj or null
+    /// <summary>
+    /// A simpler dictionary that maps any object key to any object value (or null)
+    /// </summary>
+    public class CookieHash : CookieDict<object, object> // key: obj and value: obj or null
     {
         /// <summary>
         /// getter with casting, can be null
@@ -269,9 +303,9 @@ namespace smth
         /// <typeparam name="T">type to cast to</typeparam>
         /// <param name="key">key to find</param>
         /// <returns></returns>
-        public T? GetAs<T>(object key)
+        public T GetAs<T>(object key)
         {
-            object? val = Get(key);
+            object val = Get(key);
             if (val is T typedVal)
                 return typedVal;
             return default;   // if not the type

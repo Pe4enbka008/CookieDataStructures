@@ -20,6 +20,38 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieNodeList contains
+    IsEmpty - public function
+    RecursionCount - private static function
+    CountElementDuplicates - public function
+    CountElementDuplicatesLoop - private function
+    GetIndex - public function
+    Find - public function
+    Get - public function
+    GetFirst - public function
+    Contains - public function
+    Copy - public function
+    CopyTo - public function
+    ChangeType - public function
+    PartlyChangeType - public function
+    Append - public function (2 overloads: ListType, CookieNodeList<ListType>)
+    Add - public function (2 overloads: ListType, CookieNodeList<ListType>)
+    AddAt - public function
+    Remove - public function
+    RemoveAt - public function
+    RemoveLast - public function
+    RemoveFirst - public function
+    RemoveDuplicates - public function
+    RemoveAll - public function
+    Clear - public function
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    ToString - public function (2 overloads: no-arg, with split string)
+    Reverse - public static function
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -29,10 +61,10 @@ namespace smth
     /// <typeparam name="ListType">Type of the node list</typeparam>
     public class CookieNodeList<ListType> : IEnumerable<ListType>, ICollection<ListType>
     {
-        /// <summary>
-        /// The list itself
-        /// </summary>
         private CookieNode<ListType>? head_node;
+
+        private static string className = "CookieNodeList";
+
         /// <summary>
         /// Is the list ReadOnly
         /// </summary>
@@ -173,13 +205,14 @@ namespace smth
         } // ListType
 
         /// <summary>
-        /// Finds index of the item inputted. If the item is not found, returns -1
+        /// Finds index of the item inputted. If the item is not found, throws Exception
         /// </summary>
         /// <param name="item">an item that needs to be found</param>
         /// <returns>Int represented index</returns>
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
         public int GetIndex(ListType item)
         {
-            if (this.head_node == null) return -1;
+            if (this.head_node == null) throw new CookieEmptyStructureException(className);
 
             CookieNode<ListType> some_node = this.head_node;
             int counter = 0;
@@ -193,9 +226,9 @@ namespace smth
             } // while
             return -1;
         } // GetIndex
-        
+
         /// <summary>
-        /// Finds index of the item inputted. If the item is not found, returns -1
+        /// Finds index of the item inputted. If the item is not found, throws Exception
         /// </summary>
         /// <param name="item">an item that needs to be found</param>
         /// <returns>Int represented index</returns>
@@ -207,10 +240,14 @@ namespace smth
         /// </summary>
         /// <param name="index">An index type Int</param>
         /// <returns>Found element</returns>
-        /// <exception cref="IndexOutOfRangeException">If the index is out-of-range</exception>
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
+        /// <exception cref="CookieIndexOutOfRangeException">If the index is out-of-range</exception>
         public ListType Get(int index)
         {
-            if (index < 0 || index >= RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className);
+            else if (index < 0 || index >= RecursionCount(this.head_node)) 
+                throw new CookieIndexOutOfRangeException(index);
 
             CookieNode<ListType>? some_node = this.head_node;
             for (; 0 < index; index--)
@@ -221,27 +258,39 @@ namespace smth
         /// <summary>
         /// Returns first value of the list
         /// </summary>
-        /// <returns>Found element, null if no elements are in the list</returns>
+        /// <returns>Found element</returns>
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
         public ListType GetFirst()
         {
             if (this.head_node == null)
-                return (ListType)(object)null;
+                throw new CookieEmptyStructureException(className);
             return this.Get(0);
         } // GetFirst
 
 
         // Special case : contains value
-        
+
         /// <summary>
         /// Checks if the list has an item specified
         /// </summary>
         /// <param name="item">An item to check for</param>
         /// <returns>Boolean if the the item found</returns>
+        /// <exception cref="CookieIndexOutOfRangeException">If the index is out-of-range</exception>
         public bool Contains(ListType item)
-        { if (this.head_node == null) return false; return this.GetIndex(item) != -1; }
+        { 
+            if (this.head_node == null) 
+                return false;
+            try
+            {
+                this.GetIndex(item);
+                return true;
+            } // try
+            catch (CookieIndexOutOfRangeException)
+            { return false; }
+        } // Contains
 
         // Special case : copy value
-        
+
         /// <summary>
         /// The function return a copy of this object
         /// </summary>
@@ -264,15 +313,17 @@ namespace smth
 
 
         // Special case : change type
-        
+
         /// <summary>
-        /// Changes the type of the list to the requested - be sure it's convertable!
+        /// Changes the type of the list to the requested - be sure it's convertible!
         /// </summary>
         /// <typeparam name="RequestedType">Type to change to</typeparam>
-        /// <returns>If possible, the list, if not null list</returns>
-        public CookieNodeList<RequestedType>? ChangeType<RequestedType>()
+        /// <returns>The converted list</returns>
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
+        /// <exception cref="CookieStructureArgumentException">If conversion failed</exception>
+        public CookieNodeList<RequestedType> ChangeType<RequestedType>()
         {
-            if (this.head_node == null) return null;
+            if (this.head_node == null) throw new CookieEmptyStructureException(className);
             CookieNodeList<RequestedType> new_list = new CookieNodeList<RequestedType>();
 
             CookieNode<ListType>? nodes = this.head_node;
@@ -284,7 +335,7 @@ namespace smth
                     new_list.Append(value);
                 } // try
                 catch
-                { return null; } // conversion failed - break
+                { throw new CookieStructureArgumentException($"failed to convert to type {nameof(RequestedType)}"); } // conversion failed - return
 
                 nodes = nodes.Next;
             } // while
@@ -297,9 +348,10 @@ namespace smth
         /// </summary>
         /// <typeparam name="RequestedType">Type to change to</typeparam>
         /// <returns>A list of possible values</returns>
-        public CookieNodeList<RequestedType>? PartlyChangeType<RequestedType>()
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
+        public CookieNodeList<RequestedType> PartlyChangeType<RequestedType>()
         {
-            if (this.head_node == null) return null;
+            if (this.head_node == null) throw new CookieEmptyStructureException(className);
             CookieNodeList<RequestedType> new_list = new CookieNodeList<RequestedType>();
 
             CookieNode<ListType>? nodes = this.head_node;
@@ -410,31 +462,30 @@ namespace smth
         /// Adds an item to index give in the list
         /// </summary>
         /// <param name="item">Item to add</param>
+        /// <exception cref="CookieIndexOutOfRangeException">If the index is out-of-range</exception>
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
         public void AddAt(ListType item, int index)
         {
-            if (index < 0 || index >= RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
+            if (index < 0 || index >= RecursionCount(this.head_node)) throw new CookieIndexOutOfRangeException(index);
+            else if (this.head_node == null) throw new CookieEmptyStructureException(className);
 
-            CookieNode<ListType> newNode = new(item);
-            if (this.head_node == null || index == 0)
+            if (index == 0)
             {
-                newNode.SetNext(this.head_node);
-                this.head_node = newNode;
+                this.head_node.SetValue(item);
                 return;
             } // if
 
             CookieNode<ListType> current = this.head_node;
             int currentIndex = 0;
 
-            while (current != null && currentIndex < index - 1)
+            while (current != null && currentIndex < index)
             {
                 current = current.GetNext();
                 currentIndex++;
             } // while
 
-            if (current == null)  throw new IndexOutOfRangeException(nameof(index));
-
-            newNode.SetNext(current.GetNext());
-            current.SetNext(newNode);
+            if (current == null) throw new CookieIndexOutOfRangeException(index);
+            current.SetValue(item);
         } // AddAt
 
 
@@ -455,7 +506,7 @@ namespace smth
             if (this.head_node.Equals(item))
             {
                 this.head_node = this.head_node.GetNext();
-                return false;
+                return true;
             } // if
 
             CookieNode<ListType> some_node = this.head_node;
@@ -475,11 +526,12 @@ namespace smth
         /// Removes an item at the index specified
         /// </summary>
         /// <param name="index">An index</param>
-        /// <exception cref="IndexOutOfRangeException">If the index is out-of-range</exception>
+        /// <exception cref="CookieIndexOutOfRangeException">If the index is out-of-range</exception>
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
         public void RemoveAt(int index)
         {
-            if (this.head_node == null) return;
-            if (index < 0 || index >= RecursionCount(this.head_node)) throw new IndexOutOfRangeException(nameof(index));
+            if (this.head_node == null) throw new CookieEmptyStructureException(className);
+            if (index < 0 || index >= RecursionCount(this.head_node)) throw new CookieIndexOutOfRangeException(index);
 
             // item is head
             if (index == 0)
@@ -548,8 +600,16 @@ namespace smth
         // override
 
         // IEnumerable
+        /// <summary>
+        /// Returns an enumerator that walks the list from first to last element (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator over the list's values, in order</returns>
         public IEnumerator<ListType> GetEnumerator()
         { if (head_node != null) return head_node.GetEnumerator(); return Enumerable.Empty<ListType>().GetEnumerator(); }
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over the list's values, in order</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 

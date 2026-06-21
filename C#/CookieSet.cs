@@ -20,6 +20,26 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieSet contains
+    IsEmpty - public function
+    Get - public function
+    Add - public function
+    SetAt - public function
+    Remove - public function
+    Clear - public function
+    Contains - public function
+    Copy - public function
+    Union - public function
+    Intersection - public function
+    Difference - public function
+    SymmetricDifference - public function
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    ToString - public function (2 overloads: no-arg, with split string)
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -30,6 +50,12 @@ namespace smth
     public class CookieSet<SetType> : IEnumerable<SetType>
     {
         private CookieDict<SetType, bool> values;
+
+        private static string className = "CookieSet";
+
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public CookieSet()
         { values = new CookieDict<SetType, bool>(); } 
 
@@ -61,7 +87,12 @@ namespace smth
         /// <param name="key">Key to the value(s)</param>
         /// <returns>The first accuring value in the key list</returns>
         public SetType Get(int index)
-        { return this.values.CookieKeys[index]; }
+        {
+            try
+            { return this.values.CookieKeys[index]; }
+            catch (CookieEmptyStructureException)
+            { throw new CookieEmptyStructureException(className); }
+        } // Get
 
 
         // Setters:
@@ -81,12 +112,8 @@ namespace smth
         /// <param name="new_value">New value</param>
         public void SetAt(int index, SetType new_value)
         {
-            try
-            {
-                SetType value = this.Get(index);
-                this.values.Remove(value);
-            } // try
-            catch { }
+            SetType value = this.Get(index);
+            this.values.Remove(value);
             this.values.Set(new_value, true);
         } // SetAt
 
@@ -129,7 +156,8 @@ namespace smth
         public CookieSet<SetType> Copy()
         {
             if (this.IsEmpty())
-                return new CookieSet<SetType>();
+                throw new CookieEmptyStructureException(className);
+
             CookieSet<SetType> set = new CookieSet<SetType>();
             foreach (SetType value in this)
                 set.Add(value);
@@ -206,8 +234,16 @@ namespace smth
 
         // IEnumerable
 
+        /// <summary>
+        /// Returns an enumerator over the set's values (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator over the set's values</returns>
         public IEnumerator<SetType> GetEnumerator()
-        { if (this.values.CookieKeys != null) return this.values.CookieKeys.GetEnumerator(); return Enumerable.Empty<QueueType>().GetEnumerator(); }
+        { if (this.values.CookieKeys != null) return this.values.CookieKeys.GetEnumerator(); return Enumerable.Empty<SetType>().GetEnumerator(); }
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over the set's values</returns>
         IEnumerator IEnumerable.GetEnumerator () => GetEnumerator();
 
         // object 

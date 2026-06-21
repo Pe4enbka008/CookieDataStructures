@@ -20,6 +20,25 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieDeque contains
+    IsEmpty - public function
+    PushFront - public function
+    PopFront - public function
+    PushBack - public function
+    PopBack - public function
+    GetTop - public function
+    Copy - public function
+    Clear - public function
+    Reverse - public function
+    RotateLeft - public function
+    RotateRight - public function
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    ToString - public function (2 overloads: no-arg, with split string)
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -31,6 +50,8 @@ namespace smth
     {
         private CookieNode<DequeType>? head_node;
         private CookieNode<DequeType>? last_node;
+
+        private static string className = "CookieDeque";
 
 
         /// <summary>
@@ -103,10 +124,10 @@ namespace smth
         /// Gets the front value ; could be null
         /// </summary>
         /// <returns>The top (first added) value</returns>
-        public DequeType? PopFront()
+        public DequeType PopFront()
         {
             if (this.head_node == null)
-                throw new Exception("No values to pop");
+                throw new CookieEmptyStructureException(className);
 
             CookieNode<DequeType> node = this.head_node;
             if (node.Next == null)
@@ -137,12 +158,19 @@ namespace smth
         /// Gets the last value ; could be null
         /// </summary>
         /// <returns>The top (first added) value</returns>
-        public DequeType? PopBack()
+        public DequeType PopBack()
         {
             if (this.head_node == null)
-                throw new Exception("No values to pop");
+                throw new CookieEmptyStructureException(className);
 
             CookieNode<DequeType> node = this.last_node;
+            if (this.head_node == this.last_node)
+            {
+                this.head_node = null;
+                this.last_node = null;
+                return node.Value;
+            } // if
+
             this.last_node = this.head_node;
             while (this.last_node.Next != node)
                 this.last_node = this.last_node.Next;
@@ -156,18 +184,18 @@ namespace smth
         /// Gets the top value, if the stack is empty, returns default of the type
         /// </summary>
         /// <returns>value of the top</returns>
-        public DequeType? GetTop()
-        { return this.head_node != null ? this.head_node.Value : throw new Exception("No values to pop"); } 
+        public DequeType GetTop()
+        { return this.head_node != null ? this.head_node.Value : throw new CookieEmptyStructureException(className); } 
 
 
         /// <summary>
         /// Creates a copy of the object
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieDeque<DequeType>? Copy()
+        public CookieDeque<DequeType> Copy()
         {
             if (this.head_node == null)
-                return null;
+                return new();
 
             CookieNode<DequeType> return_value = new CookieNode<DequeType>(this.head_node.Value);
             CookieNode<DequeType> current = return_value;
@@ -196,7 +224,7 @@ namespace smth
         /// Creates a copy of the object in type of the CookieQueue 
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieDeque<DequeType>? Reverse()
+        public CookieDeque<DequeType> Reverse()
         {
             if (this.head_node == null) return null;
             if (this.Length <= 1) return this.Copy();
@@ -231,8 +259,16 @@ namespace smth
         // override
 
         // IEnumerable
+        /// <summary>
+        /// Returns an enumerator that walks the deque from front to back (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator over the deque's values, front first</returns>
         public IEnumerator<DequeType> GetEnumerator()
         { if (head_node != null) return head_node.GetEnumerator(); return Enumerable.Empty<DequeType>().GetEnumerator(); }
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over the deque's values, front first</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // object 

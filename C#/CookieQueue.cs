@@ -20,6 +20,23 @@ using System.Collections;
 */
 
 
+
+/*
+CookieDataStructure: CookieQueue contains
+    IsEmpty - public function
+    Insert - public function
+    RemoveValue - public function
+    GetTop - public function
+    Copy - public function
+    Clear - public function
+    Reverse - public function
+    RotateLeft - public function
+    RotateRight - public function
+    GetEnumerator - public function (and IEnumerable.GetEnumerator implementation)
+    ToString - public function (2 overloads: no-arg, with split string)
+*/
+
+
 namespace smth
 {
     /// <summary>
@@ -31,6 +48,8 @@ namespace smth
     {
         private CookieNode<QueueType>? head_node;
         private CookieNode<QueueType>? last_node;
+
+        private static string className = "CookieQueue";
 
 
         /// <summary>
@@ -102,10 +121,11 @@ namespace smth
         /// FIFO (FIRST IN ; FIRST OUT) - gets the front value ; could be null
         /// </summary>
         /// <returns>The top (first added) value</returns>
-        public QueueType? RemoveValue()
+        /// <exception cref="CookieEmptyStructureException">If no values are in the list</exception>
+        public QueueType RemoveValue()
         {
             if (this.head_node == null)
-                throw new Exception("No values to remove");
+                throw new CookieEmptyStructureException(className);
 
             CookieNode<QueueType> node = this.head_node;
             if (node.GetNext() == null)
@@ -118,25 +138,28 @@ namespace smth
         /// <summary>
         /// FIFO (FIRST IN ; FIRST OUT) - gets the front value ; could be null
         /// </summary>
-        public QueueType? Remove { get { return this.RemoveValue(); } }
+        /// <exception cref="CookieEmptyStructureException">If no values are in the list</exception>
+        public QueueType Remove { get { return this.RemoveValue(); } }
 
 
         /// <summary>
         /// Gets the top value, if the stack is empty, returns default of the type
         /// </summary>
         /// <returns>value of the top</returns>
-        public QueueType? GetTop()
-        { return this.head_node != null ? this.head_node.Value : throw new Exception("No values to pop"); } 
+        /// <exception cref="CookieEmptyStructureException">If no values are in the list</exception>
+        public QueueType GetTop()
+        { return this.head_node != null ? this.head_node.Value : throw new CookieEmptyStructureException(className); }
 
 
         /// <summary>
         /// Creates a copy of the object
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieQueue<QueueType>? Copy()
+        /// <exception cref="CookieEmptyStructureException">If no values are in the list</exception>
+        public CookieQueue<QueueType> Copy()
         {
             if (this.head_node == null)
-                return null;
+                throw new CookieEmptyStructureException(className);
 
             CookieNode<QueueType> return_value = new CookieNode<QueueType>(this.head_node.Value);
             CookieNode<QueueType> current = return_value;
@@ -165,9 +188,8 @@ namespace smth
         /// Creates a copy of the object in type of the CookieQueue
         /// </summary>
         /// <returns>copy of the node list</returns>
-        public CookieQueue<QueueType>? Reverse()
+        public CookieQueue<QueueType> Reverse()
         {
-            if (this.head_node == null) return null;
             if (this.Length <= 1) return this.Copy();
 
             CookieStack<QueueType> rev_stack = new CookieStack<QueueType>();
@@ -216,8 +238,16 @@ namespace smth
         // override
 
         // IEnumerable
+        /// <summary>
+        /// Returns an enumerator that walks the queue from front to back (enables foreach)
+        /// </summary>
+        /// <returns>An enumerator over the queue's values, front first</returns>
         public IEnumerator<QueueType> GetEnumerator()
         { if (head_node != null) return head_node.GetEnumerator(); return Enumerable.Empty<QueueType>().GetEnumerator(); }
+        /// <summary>
+        /// Non-generic IEnumerable.GetEnumerator implementation, forwards to the generic version
+        /// </summary>
+        /// <returns>An enumerator over the queue's values, front first</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // object
