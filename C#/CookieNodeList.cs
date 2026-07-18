@@ -73,6 +73,7 @@ namespace smth
 
 
         // Builders:
+
         /// <summary>
         /// Class setter
         /// </summary>
@@ -118,7 +119,8 @@ namespace smth
 
 
 
-        // Length-connected
+        // Length-connected:
+
         /// <summary>
         /// Return current length of the list
         /// </summary>
@@ -153,6 +155,7 @@ namespace smth
 
 
         // Counters:
+
         /// <summary>
         /// Counts number of duplicates of item given
         /// </summary>
@@ -277,6 +280,7 @@ namespace smth
             { return false; }
         } // Contains
 
+
         // Special case : copy value
 
         /// <summary>
@@ -285,8 +289,6 @@ namespace smth
         /// <returns></returns>
         public CookieNodeList<ListType> Copy()
         { return new CookieNodeList<ListType>(this); }
-
-        // ICollection
 
         /// <summary>
         /// Copies elements ot array given (for ICollection)
@@ -383,7 +385,7 @@ namespace smth
 
 
 
-        // Setters
+        // Setters:
         
         /// <summary>
         /// Adds an item to the end of the list
@@ -637,9 +639,10 @@ namespace smth
 
 
 
-        // override
+        // override:
 
         // IEnumerable
+
         /// <summary>
         /// Returns an enumerator that walks the list from first to last element (enables foreach)
         /// </summary>
