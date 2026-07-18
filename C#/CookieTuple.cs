@@ -267,7 +267,7 @@ namespace smth
                     save_list[count++] = value;
                 } // try
                 catch
-                { throw new CookieStructureArgumentException($"failed to convert to type {nameof(RequestedType)}"); } // conversion failed - return
+                { throw new CookieStructureArgumentException($"Failed to convert to type {nameof(RequestedType)}"); } // conversion failed - return
 
                 nodes = nodes.Next;
             } // while

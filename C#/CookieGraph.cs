@@ -522,7 +522,7 @@ namespace smth
                     } // if
             } // while
 
-            if (!visited.Contains(to)) throw new CookieStructureArgumentException($"no path from {from} to {to}");
+            if (!visited.Contains(to)) throw new CookieStructureArgumentException($"No path from {from} to {to}");
             CookieNodeList<GraphType> result = new();
 
             GraphType current_value = to;

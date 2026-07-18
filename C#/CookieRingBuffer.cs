@@ -66,7 +66,7 @@ namespace smth
         /// <exception cref="CookieStructureArgumentException">If size is 0 or negative</exception>
         public CookieRingBuffer(int size)
         {
-            if (size <= 0) throw new CookieStructureArgumentException("size cannot be 0 or negative");
+            if (size <= 0) throw new CookieStructureArgumentException("Size cannot be 0 or negative");
             this.capacity = size;
             this.count = 0;
             this.head_node = new CookieNode<RingType>(null);

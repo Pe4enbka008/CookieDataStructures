@@ -62,13 +62,14 @@ namespace smth
     public class CookieNodeList<ListType> : IEnumerable<ListType>, ICollection<ListType>
     {
         private CookieNode<ListType>? head_node;
+        private bool readOnly;
 
         private static string className = "CookieNodeList";
 
         /// <summary>
         /// Is the list ReadOnly
         /// </summary>
-        public bool IsReadOnly { get; }
+        public bool IsReadOnly { get { return readOnly; } }
 
 
         // Builders:
@@ -94,26 +95,6 @@ namespace smth
                     prev_node.SetNext(some_node);
                 prev_node = some_node;
             } // foreach
-        } // __init__
-        /// <summary>
-        /// Class setter with valuables
-        /// </summary>
-        public CookieNodeList(CookieNode<ListType> nodes)
-        {
-            this.head_node = null;
-            CookieNode<ListType> prev_node = null;
-
-            while (nodes != null)
-            {
-                CookieNode<ListType> some_node = new(nodes.Value);
-
-                if (this.head_node == null)
-                    this.head_node = some_node;
-                else
-                    prev_node.SetNext(some_node);
-                prev_node = some_node;
-                nodes = nodes.Next;
-            } // while
         } // __init__
         /// <summary>
         /// Class setter with valuables
@@ -150,6 +131,13 @@ namespace smth
         /// <returns>Int represented length</returns>
         public bool IsEmpty()
         { return this.head_node == null; }
+
+
+        /// <summary>
+        /// Switches ReadOnly to opposite
+        /// </summary>
+        public void SwitchReadOnly()
+        { this.readOnly = !this.readOnly; }
 
 
         /// <summary>
@@ -312,6 +300,25 @@ namespace smth
         } // CopyTo
 
 
+        // Special case : reverse
+
+        /// <summary>
+        /// The function reverses the list
+        /// </summary>
+        /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
+        public void Reverse()
+        {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
+            if (this.Count <= 1) return;
+            CookieNodeList<ListType> copy_list = this.Copy();
+            this.Clear();
+            for (int i = 0; i < copy_list.Count; i++)
+                this.Add(copy_list.Get(i));
+        } // Reverse
+
+
         // Special case : change type
 
         /// <summary>
@@ -335,7 +342,7 @@ namespace smth
                     new_list.Append(value);
                 } // try
                 catch
-                { throw new CookieStructureArgumentException($"failed to convert to type {nameof(RequestedType)}"); } // conversion failed - return
+                { throw new CookieStructureArgumentException($"Failed to convert to type {nameof(RequestedType)}"); } // conversion failed - return
 
                 nodes = nodes.Next;
             } // while
@@ -351,7 +358,9 @@ namespace smth
         /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
         public CookieNodeList<RequestedType> PartlyChangeType<RequestedType>()
         {
-            if (this.head_node == null) throw new CookieEmptyStructureException(className);
+            if (this.head_node == null) 
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+            
             CookieNodeList<RequestedType> new_list = new CookieNodeList<RequestedType>();
 
             CookieNode<ListType>? nodes = this.head_node;
@@ -383,6 +392,9 @@ namespace smth
         public void Append(ListType item)
         {
             if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
+            if (this.head_node == null)
             {
                 this.head_node = new(item);
                 return;
@@ -400,6 +412,9 @@ namespace smth
         /// <param name="nodes">List to add</param>
         public void Append(CookieNodeList<ListType> nodes)
         {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
             if (nodes == null || nodes.head_node == null) return;
             
             CookieNode<ListType> tail = this.head_node;
@@ -432,6 +447,9 @@ namespace smth
         public void Add(ListType item)
         {
             if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
+            if (this.head_node == null)
             {
                 this.head_node = new(item);
                 return;
@@ -448,6 +466,9 @@ namespace smth
         /// <param name="nodes">List to add</param>
         public void Add(CookieNodeList<ListType> nodes)
         {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
             if (nodes.head_node == null) return;
 
             CookieNode<ListType> last = nodes.head_node;
@@ -466,6 +487,9 @@ namespace smth
         /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
         public void AddAt(ListType item, int index)
         {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
             if (index < 0 || index >= RecursionCount(this.head_node)) throw new CookieIndexOutOfRangeException(index);
             else if (this.head_node == null) throw new CookieEmptyStructureException(className);
 
@@ -500,6 +524,9 @@ namespace smth
         public bool Remove(ListType item)
         {
             if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
+            if (this.head_node == null)
                 return false;
 
             // item is head
@@ -530,6 +557,9 @@ namespace smth
         /// <exception cref="CookieEmptyStructureException">If no values are in the structure</exception>
         public void RemoveAt(int index)
         {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
             if (this.head_node == null) throw new CookieEmptyStructureException(className);
             if (index < 0 || index >= RecursionCount(this.head_node)) throw new CookieIndexOutOfRangeException(index);
 
@@ -563,6 +593,9 @@ namespace smth
         /// <param name="item">Element to delete</param>
         public void RemoveDuplicates(ListType item)
         {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
             int first = this.GetIndex(item);
             int counter = this.CountElementDuplicates(item);
             if (first == -1 || counter <= 1)
@@ -583,6 +616,9 @@ namespace smth
         /// <param name="item">Element to delete</param>
         public void RemoveAll(ListType item)
         {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+
             if (!this.Contains(item)) return;
             this.RemoveDuplicates(item);
             this.Remove(item);
@@ -593,7 +629,11 @@ namespace smth
         /// Wipes the list clean
         /// </summary>
         public void Clear()
-        { this.head_node = null; }
+        {
+            if (this.head_node == null)
+                throw new CookieEmptyStructureException(className + " cannot be converted/edited due to access level being ReadOnly.");
+            this.head_node = null; 
+        } // Clear
 
 
 
@@ -644,22 +684,6 @@ namespace smth
 
             return str + "]";
         } // override ToString
-
-
-
-        // Statics:
-        /// <summary>
-        /// The function reverses the list given
-        /// </summary>
-        /// <param name="list">List to reverse</param>
-        public static void Reverse(CookieNodeList<object> list)
-        {
-            if (list == null || list.Count <= 1) return;
-            CookieNodeList<object> copy_list = list.Copy();
-            list.Clear();
-            for (int i = 0; i < copy_list.Count; i++)
-                list.Add(copy_list.Get(i));
-        } // Reverse
 
 
     } // class CookieNodeList
