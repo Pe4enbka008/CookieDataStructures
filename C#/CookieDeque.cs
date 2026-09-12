@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 
 /*
     CookieDataStructure
@@ -39,7 +41,7 @@ CookieDataStructure: CookieDeque contains
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     /// <summary>
     /// This CookieDataStructure requires CookieNode.cs file!

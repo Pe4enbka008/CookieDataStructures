@@ -1,6 +1,6 @@
-﻿using NHunspell;
-using System;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 /*
     CookieDataStructure
@@ -48,7 +48,7 @@ CookieDataStructure: CookieNodeWorker contains
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     /// <summary>
     /// Node for many things!
@@ -171,6 +171,7 @@ namespace smth
     } // class CookieNode
 
 
+
     /// <summary>
     /// Helping class that manipulates with nodes
     /// The class requires NHunspell; If you don't want to download it, delete 'creators'
@@ -208,6 +209,7 @@ namespace smth
 
 
         // Creators:
+        /*
         /// <summary>
         /// creates a Node list made of random strings using lib Hunspell
         /// </summary>
@@ -269,6 +271,7 @@ namespace smth
             } // while
             return list;
         } // CreateList - string
+        */
 
         /// <summary>
         /// creates a Node list made of random int/double/float numbers using lib Random
@@ -398,18 +401,18 @@ namespace smth
         /// <returns>Reversed list</returns>
         public static CookieNode<T>? Reverse<T>(CookieNode<T>? nodes)
         {
-            if (nodes == null || RecursionCount<T>(nodes) <= 1) 
-                return nodes; 
-            
+            if (nodes == null || RecursionCount<T>(nodes) <= 1)
+                return nodes;
+
             CookieNode<T> head = null;
-            while (nodes != null) 
+            while (nodes != null)
             {
                 CookieNode<T> node = new(nodes);
-                node.Next = head; 
-                head = node; 
-                nodes = nodes.Next; 
+                node.Next = head;
+                head = node;
+                nodes = nodes.Next;
             } // while
-            return head; 
+            return head;
         } // Reverse
 
 
@@ -442,7 +445,7 @@ namespace smth
                 same = 1;
             return same + RecursionCountElement(nodes.GetNext(), value);
         } // RecursionCountElement
-        
+
 
         // Add/Remove:
         /// <summary>
@@ -512,7 +515,6 @@ namespace smth
 
 
     } // class CookieNodeWorker
-
 
 } // namespace smth
 

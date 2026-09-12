@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 
 /*
     CookieDataStructure
@@ -40,7 +42,7 @@ CookieDataStructure: CookieSet contains
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     /// <summary>
     /// This CookieDataStructure requires CookieNode.cs, CookieNodeList.cs and CookieDict.cs files!

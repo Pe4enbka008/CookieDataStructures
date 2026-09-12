@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 /*
     CookieDataStructure
@@ -40,7 +41,7 @@ CookieDataStructure: CookieTuple contains
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     /// <summary>
     /// This CookieDataStructure requires CookieNode.cs file!

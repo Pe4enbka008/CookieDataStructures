@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 
 /*
@@ -40,7 +42,7 @@ CookieDataStructure: CookieHash contains
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     /// <summary>
     /// This CookieDataStructure requires CookieNode.cs and CookieNodeList.cs files!

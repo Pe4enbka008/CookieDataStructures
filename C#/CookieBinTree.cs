@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 
 /*
     CookieDataStructure
@@ -73,7 +75,7 @@ CookieDataStructure: CookieTree contains
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     /// <summary>
     /// Node for Tree or double-linked list

@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 /*
@@ -63,7 +63,7 @@ CookieDataStructure: CookieGraph contains
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     /// <summary>
     /// Node for graph only!

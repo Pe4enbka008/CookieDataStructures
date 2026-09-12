@@ -20,7 +20,7 @@ using System.Globalization;
 */
 
 
-namespace smth
+namespace CookieDataStructure
 {
     public class CookieException : Exception
     {     // basically Interface - for try/catch
